@@ -9,7 +9,7 @@ conexao = mysql.connector.connect(
 cursor = conexao.cursor()
 print('Bem vindo!\nPor favor preencha os campos abaixo para prosseguir:')
 #login inicio
-valores = []
+valores = []    
 def login():
     #retorna ao login quando quiser
     while True:
@@ -17,8 +17,8 @@ def login():
         if not CPF.isdigit():
             print('Digite apenas números, no formato (12345678912)')
             continue
-        CPF = str(CPF)
-        if not len(CPF) == 11:
+        CPF = int(CPF)
+        if not len(str(CPF)) == 11:
             print('Digite exatamente 11 números')
             continue
         #fazer a verificação mais complicada da combinação dos números do CPF
@@ -28,16 +28,19 @@ def login():
         if not SENHA.isdigit():
             print('Escreva apenas números EX: (1234)')
             continue
-        if not len(SENHA) == 4:
+        SENHA = int(SENHA)
+        if not len(str(SENHA)) == 4:
             print('Escreva exatamente 4 digitos EX: (1234)')
             continue
-        checagem_cpf = f'SELECT EXISTS(SELECT 1 FROM cadastro WHERE CPF = {CPF})'
-        checagem_senha = f'SELECT EXISTS(SELECT 1 FROM cadastro WHERE CPF = {CPF} AND SENHA = {SENHA})'
-        if checagem_cpf == 1:
+        checagem_cpf = "SELECT CPF FROM cadastro WHERE CPF = %s"
+        cursor.execute(checagem_cpf, (CPF,))
+        resultado = cursor.fetchall()
+        if len(resultado)!=0:
+            #checagem_senha = f'SELECT SENHA FROM cadastro WHERE CPF = {CPF} AND SENHA = {SENHA})'
             if checagem_senha == 0:
                 while True:
                     decisao_senha = input('Sua senha está errada, deseja tentar novamente ?\nSe desejar tentar novamente digite 1, se desejar recuperar senha digite 2:  ')
-                    if not decisao_senha.isdigit() or 2 >= decisao_senha >= 1:
+                    if not decisao_senha.isdigit() or 2 >= decisao_senha or decisao_senha >= 1:
                         print('digite apenas 1 ou 2')
                         continue
                     decisao_senha = int(decisao_senha)
@@ -69,7 +72,7 @@ def login():
                     print('Digite apenas 1 ou 2')
                     continue
                 logado = int(logado)
-                if not logado == 1 and logado == 2:
+                if not logado >= 1 and logado <=2 :
                     print('Digite apenas 1 ou 2')
                     continue
                 break
@@ -86,12 +89,14 @@ def login():
                             print('Escreva apenas números EX: (01234567891)')
                             continue
                         CPF = int(CPF)
-                        if not len(CPF) == 11:
+                        if not len(str(CPF)) == 11:
                             print('Escreva 11 números EX: (01234567891)')
                             continue
                         break
-                    checagem_cpf = f'SELECT EXISTS(SELECT 1 FROM cadastro WHERE CPF = {CPF})'
-                    if checagem_cpf == 1:
+                    checagem_cpf = "SELECT CPF FROM cadastro WHERE CPF = %s"
+                    cursor.execute(checagem_cpf, (CPF,))
+                    resultado = cursor.fetchall()
+                    if resultado != 0 :
                         print('Esse CPF já está cadastrado')
                         while True:
                             logado2 = input('Digite 1, se você já tem login\nDigite 2 caso tenha digitado errado e queira repetir: ')
@@ -112,7 +117,7 @@ def login():
                             print('Escreva apenas números, no formato (1234)')
                             continue
                         SENHA = int(SENHA)
-                        if not len(SENHA) == 4:
+                        if not len(str(SENHA)) == 4:
                             print('Escreva exatamente 4 números, no formato (1234)')
                             continue
                         break
@@ -121,8 +126,11 @@ def login():
                     cursor.execute(adicionar)
                     conexao.commit()
                     #com cadastro criado voltará ao login
-                    print('Agora que você foi cadastrado com sucesso!\nAgora você retornará ao login, e escreva seus dados cadastrados')
+                    print(f'\033[31mFOI CRIADO UM CÓDIGO PESSOAL PARA VOCÊ USAR EM CASO DE RECUPERAÇÃO DE SENHA, NÃO O PERCA!\nSEU CÓDIGO É {CODIGO}\033[0m')
+                    print('Você foi cadastrado com sucesso!\nAgora você retornará ao login, e escreva seus dados cadastrados')
                     login()
+                cadastro()
+login()
 #MENU
                 
 cursor.close()
