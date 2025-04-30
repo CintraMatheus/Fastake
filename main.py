@@ -9,7 +9,9 @@ conexao = mysql.connector.connect(
 cursor = conexao.cursor()
 print('Bem vindo!\nPor favor preencha os campos abaixo para prosseguir:')
 #login inicio
-valores = []    
+valores = [] 
+def menu():
+    print('Você está no menu')   
 def login():
     #retorna ao login quando quiser
     while True:
@@ -35,9 +37,11 @@ def login():
         checagem_cpf = "SELECT CPF FROM cadastro WHERE CPF = %s"
         cursor.execute(checagem_cpf, (CPF,))
         resultado = cursor.fetchall()
-        if len(resultado)!=0:
-            #checagem_senha = f'SELECT SENHA FROM cadastro WHERE CPF = {CPF} AND SENHA = {SENHA})'
-            if checagem_senha == 0:
+        if len(resultado) != 0:
+            checagem_senha = "SELECT * FROM cadastro WHERE CPF = %s AND SENHA = %s"
+            cursor.execute(checagem_senha, (CPF, SENHA))
+            resultado = cursor.fetchone()
+            if not resultado:
                 while True:
                     decisao_senha = input('Sua senha está errada, deseja tentar novamente ?\nSe desejar tentar novamente digite 1, se desejar recuperar senha digite 2:  ')
                     if not decisao_senha.isdigit() or 2 >= decisao_senha or decisao_senha >= 1:
@@ -54,16 +58,24 @@ def login():
                                 print('Digite apenas números, com 4 digitos EX: (12345)')
                                 continue
                             codigo_teste = int(codigo_teste)
-                            checagem_codigo = f'SELECT EXISTS(SELECT 1 FROM cadastro WHERE CPF = {CPF} AND CODIGO = {codigo_teste})'
-                            if not checagem_codigo == 1:
+                            checagem_codigo = f'SELECT * FROM cadastro WHERE CPF = {CPF} AND CODIGO = {codigo_teste} '
+                            cursor.execute(checagem_codigo, (CPF, SENHA))
+                            resultado = cursor.fetchone()
+                            if not resultado:
                                 print('Seu código está incorreto, digite no formato (12345)')
                                 continue
+                            SENHA = randint (1000, 10000)
+                            atualizar = "UPDATE cadastro SET SENHA = %s WHERE CPF = %s"
+                            cursor.execute(atualizar)
+                            print(f'Agora sua nova senha é {SENHA}\nGuarde sua senha\nAgora você será direcionado ao login')
+                            login()
                             break
                         exit()
                 continue
             else:
                 print('Você fez o login com sucesso')
-                #puxar uma função para o MENU
+                menu()
+                exit()
         else:
             print('Seu CPF está errado')
             while True:
@@ -79,6 +91,7 @@ def login():
             if logado == 1:
                 print('Você será redirecionado para o login novamente')
                 login()
+                exit()
             if logado == 2:
                 def cadastro():
                     #vai para a parte de cadastro quando precisar
@@ -100,15 +113,20 @@ def login():
                         print('Esse CPF já está cadastrado')
                         while True:
                             logado2 = input('Digite 1, se você já tem login\nDigite 2 caso tenha digitado errado e queira repetir: ')
-                            if not logado.isdigit() or logado2 >= 1 or logado2 <= 2:
+                            if not logado2.isdigit():
                                 print('Digite apenas "1" ou "2"')
                                 continue
                             logado2 = int(logado2)
+                            if not logado2 >= 1 and logado2 <= 2:
+                                print('Digite apenas "1" ou "2"')
+                                continue
                             if logado2 == 1:
                                 login()
+                                exit()
                                 break
                             if logado2 == 2:
                                 cadastro()
+                                exit()
                                 break
                             break
                     while True:
@@ -121,7 +139,7 @@ def login():
                             print('Escreva exatamente 4 números, no formato (1234)')
                             continue
                         break
-                    CODIGO = randint(1000, 10000)
+                    CODIGO = randint(10000, 100000)
                     adicionar = f'INSERT INTO cadastro (CPF, SENHA, CODIGO) VALUE ({CPF}, {SENHA}, {CODIGO})'
                     cursor.execute(adicionar)
                     conexao.commit()
@@ -129,9 +147,10 @@ def login():
                     print(f'\033[31mFOI CRIADO UM CÓDIGO PESSOAL PARA VOCÊ USAR EM CASO DE RECUPERAÇÃO DE SENHA, NÃO O PERCA!\nSEU CÓDIGO É {CODIGO}\033[0m')
                     print('Você foi cadastrado com sucesso!\nAgora você retornará ao login, e escreva seus dados cadastrados')
                     login()
+                    exit()
                 cadastro()
 login()
 #MENU
-                
+     
 cursor.close()
 conexao.close()
