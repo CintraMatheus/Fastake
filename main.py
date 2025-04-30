@@ -44,29 +44,34 @@ def login():
             if not resultado:
                 while True:
                     decisao_senha = input('Sua senha está errada, deseja tentar novamente ?\nSe desejar tentar novamente digite 1, se desejar recuperar senha digite 2:  ')
-                    if not decisao_senha.isdigit() or 2 >= decisao_senha or decisao_senha >= 1:
+                    if not decisao_senha.isdigit():
                         print('digite apenas 1 ou 2')
                         continue
                     decisao_senha = int(decisao_senha)
+                    if not 2 >= decisao_senha or decisao_senha >= 1:
+                        print('Digite apenas 1 ou 2')
                     if decisao_senha == 1:
                         break
                     if decisao_senha == 2:
                         print('Você será redirecionado para recuperar a sua senha')
                         while True:
-                            codigo_teste = input('Informe seu código pessoal para recuperar sua senha: ')
-                            if not codigo_teste.isdigit() or len(codigo_teste) == 5:
-                                print('Digite apenas números, com 4 digitos EX: (12345)')
+                            CODIGO = input('Informe seu código pessoal para recuperar sua senha: ')
+                            if not CODIGO.isdigit():
+                                print('Digite apenas números, com 5 digitos EX: (12345)')
                                 continue
-                            codigo_teste = int(codigo_teste)
-                            checagem_codigo = f'SELECT * FROM cadastro WHERE CPF = {CPF} AND CODIGO = {codigo_teste} '
-                            cursor.execute(checagem_codigo, (CPF, SENHA))
+                            CODIGO = int(CODIGO)
+                            if not len(str(CODIGO)) == 5:
+                                print('Digite apenas números, com 5 digitos EX: (12345)')
+                            checagem_codigo = "SELECT * FROM cadastro WHERE CPF = %s AND CODIGO = %s"
+                            cursor.execute(checagem_codigo, (CPF, CODIGO))
                             resultado = cursor.fetchone()
                             if not resultado:
-                                print('Seu código está incorreto, digite no formato (12345)')
+                                print('Seu código está incorreto, tente novamente')
                                 continue
                             SENHA = randint (1000, 10000)
                             atualizar = "UPDATE cadastro SET SENHA = %s WHERE CPF = %s"
-                            cursor.execute(atualizar)
+                            cursor.execute(atualizar, (SENHA, CPF))
+                            conexao.commit()
                             print(f'Agora sua nova senha é {SENHA}\nGuarde sua senha\nAgora você será direcionado ao login')
                             login()
                             break
@@ -109,7 +114,7 @@ def login():
                     checagem_cpf = "SELECT CPF FROM cadastro WHERE CPF = %s"
                     cursor.execute(checagem_cpf, (CPF,))
                     resultado = cursor.fetchall()
-                    if resultado != 0 :
+                    if len(resultado) != 0:
                         print('Esse CPF já está cadastrado')
                         while True:
                             logado2 = input('Digite 1, se você já tem login\nDigite 2 caso tenha digitado errado e queira repetir: ')
