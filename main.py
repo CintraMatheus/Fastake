@@ -11,7 +11,6 @@ conexao = mysql.connector.connect(
 )
 cursor = conexao.cursor()
 print('Bem vindo à Fastake!!\nPor favor preencha os campos abaixo para prosseguir:')
-time.sleep(1)
 # == FUNÇÃO PARA ADICIONAR CRÉDITOS ==
 
 def creditos_add():
@@ -77,6 +76,7 @@ def menu_f():
     '\n3 - Ver restaurantes'
     '\n4 - Ver tickets'
     '\n5 - Deletar conta'
+    '\n6 - Ir para página de login'
     )
     menu = True
     while menu: # == LOOP PARA SEMPRE VOLTAR AO MENU PRINCIPAL AO FINAL DE UM PROCESSO ESPECÍFICO ==
@@ -183,6 +183,12 @@ def menu_f():
                                 credito_desconto = credito - 45
                                 cursor.execute('UPDATE cadastros SET credito = %s WHERE senha = %s', (credito_desconto, confirmar_compra)) # == UPDATE DOS CRÉDITOS SUBTRAIDOS PELO VALOR DO PRATO ==
                                 conexao.commit()
+                                cursor.execute('SELECT ticketpizzaria FROM cadastros WHERE senha = %s', (confirmar_compra, )) # TESTE PARA GERAR TICKETS !!!
+                                resultado_qtdatual = cursor.fetchone()
+                                resultado_format = int(resultado_qtdatual[0])
+                                qtd_ticket_atual = (resultado_format) + 1
+                                cursor.execute('UPDATE cadastros SET ticketpizzaria = %s WHERE senha = %s', (qtd_ticket_atual, confirmar_compra))
+                                conexao.commit()
                                 print('Compra realizada com sucesso e Ticket gerado\nEstamos lhe redirecionando para o menu..')
                                 time.sleep(1)
                                 break
@@ -229,9 +235,15 @@ def menu_f():
                             if credito >= 40: # == ANÁLISE PARA VER SE O USUÁRIO POSSUI CRÉDITO ==
                                 print('Estamos processando-o...')
                                 time.sleep(1)
-                                credito_desconto = credito - 40
+                                credito_desconto = credito - 40 
                                 cursor.execute('UPDATE cadastros SET credito = %s WHERE senha = %s', (credito_desconto, confirmar_compra))
                                 conexao.commit() # == SUBTRAÇÃO DE CRÉDITOS DO USUÁRIO DE ACORDO COM O VALOR DO PEDIDO ==
+                                cursor.execute('SELECT tickethamburgueria FROM cadastros WHERE senha = %s', (confirmar_compra, )) # TESTE PARA GERAR TICKETS !!!
+                                resultado_qtdatual = cursor.fetchone()
+                                resultado_format = int(resultado_qtdatual[0])
+                                qtd_ticket_atual = (resultado_format) + 1
+                                cursor.execute('UPDATE cadastros SET tickethamburgueria = %s WHERE senha = %s', (qtd_ticket_atual, confirmar_compra))
+                                conexao.commit()
                                 print('Compra realizada com sucesso e Ticket gerado\nEstamos lhe redirecionando para o menu..')
                                 time.sleep(1)
                                 break
@@ -280,6 +292,12 @@ def menu_f():
                                 credito_desconto = credito - 35 # == UPDATE DOS CRÉDITOS ATUAIS - O VALOR DO PEDIDO ==
                                 cursor.execute('UPDATE cadastros SET credito = %s WHERE senha = %s', (credito_desconto, confirmar_compra))
                                 conexao.commit()
+                                cursor.execute('SELECT ticketcomidabr FROM cadastros WHERE senha = %s', (confirmar_compra, )) # TESTE PARA GERAR TICKETS !!!
+                                resultado_qtdatual = cursor.fetchone()
+                                resultado_format = int(resultado_qtdatual[0])
+                                qtd_ticket_atual = (resultado_format) + 1
+                                cursor.execute('UPDATE cadastros SET ticketcomidabr = %s WHERE senha = %s', (qtd_ticket_atual, confirmar_compra))
+                                conexao.commit()
                                 print('Compra realizada com sucesso e Ticket gerado\nEstamos lhe redirecionando para o menu..')
                                 time.sleep(1)
                                 break
@@ -301,13 +319,37 @@ def menu_f():
                     print('Digite uma opção válida de restaurante')
                 break
             menu_f() 
-            
 
         # == VER TICKET ==
         elif opcao_menu == '4':
-            print('Sua quantidade de tickets é de: ')
-            time.sleep(1)
-            menu = True # == EM DESENVOLVIMENTO ==
+            ticket = True
+            while ticket:
+                senha_verificar = input('Digite aqui sua senha para continuar: ')
+                cursor.execute('SELECT * FROM cadastros WHERE senha = %s', (senha_verificar,))
+                resultado = cursor.fetchall()
+                if resultado:
+                    cursor.execute('SELECT ticketpizzaria FROM cadastros WHERE senha = %s', (senha_verificar,))
+                    resultado_pizzaria = cursor.fetchall()
+                    cursor.execute('SELECT tickethamburgueria FROM cadastros WHERE senha = %s', (senha_verificar,))
+                    resultado_hamburgueria = cursor.fetchall()
+                    cursor.execute('SELECT ticketcomidabr FROM cadastros WHERE senha = %s', (senha_verificar,))
+                    resultado_comida_br = cursor.fetchall()
+                    qtd_ticket_pizzaria = int(resultado_pizzaria[0][0])
+                    qtd_ticket_hamburgueria = int(resultado_hamburgueria[0][0])
+                    qtd_ticket_comida_br = int(resultado_comida_br[0][0])
+                    print('Estamos carregando seus tickets...')
+                    time.sleep(1)
+                    print(f'Você tem:\n{qtd_ticket_pizzaria} tickets na Pizzaria!\n{qtd_ticket_hamburgueria} tickets na Hamburgueria!\n{qtd_ticket_comida_br} tickets na Comida Brasileira!')
+                    decisao_ticket = input('Deseja retornar ao menu? Digite 1 para retornar : ')
+                    if decisao_ticket == '1':
+                        menu_f()
+                        break
+                    else:
+                        print('Estamos lhe redirecionando para o início dessa aba!')
+                        time.sleep(1)
+                else:
+                    print('Senha inválida, digite novamente')
+            menu_f()
 
         # == DELETAR CONTA ==
 
@@ -358,6 +400,8 @@ def menu_f():
             #delete, DELETE ( DELETE FROM cadastros WHERE cpf = "{cpf}")
             # cadastros = tabela-alvo
             # cpf = coluna-alvo e onde apagar
+            login()
+        elif opcao_menu == '6':
             login()
         else:
             print('Tente uma opção válida!')
