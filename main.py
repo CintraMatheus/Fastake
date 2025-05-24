@@ -4,10 +4,10 @@ import mysql.connector
 import time
 from random import randint
 conexao = mysql.connector.connect(
-    host = 'localhost',
-    user = 'root',
-    password = '2710',
-    database = 'fastake_project',
+    host = 'sql10.freesqldatabase.com',
+    user = 'sql10780881',
+    password = 'xUqWWm3vPM',
+    database = 'sql10780881',
 )
 cursor = conexao.cursor()
 print('Bem vindo à Fastake!!\nPor favor preencha os campos abaixo para prosseguir:')
