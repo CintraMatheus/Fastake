@@ -1,5 +1,6 @@
 # == CONEXÃO COM BANCO DE DADOS DO MYSQL ==
 # == OBS.: CONEXÃO DO BANCO DE DADOS NA NUVEM EM ANDAMENTO... ==
+import funcoes_fastake
 import mysql.connector
 import time
 from random import randint
@@ -10,7 +11,7 @@ conexao = mysql.connector.connect(
     database = 'sql10780881',
 )
 cursor = conexao.cursor()
-print('Bem vindo à Fastake!!\nPor favor preencha os campos abaixo para prosseguir:')
+
 # == FUNÇÃO PARA ADICIONAR CRÉDITOS ==
 
 def creditos_add():
@@ -64,7 +65,254 @@ def creditos_add():
                             break
                     else:
                         print('Senha inválida. Tente novamente.\n')
+
+# == FUNÇÃO CADASTRO ==
+
+def cadastro():
+            print('Vamos fazer seu cadastro')
+            while True:
+                cpf = input('Informe seu CPF: ') 
+                if not cpf.isdigit(): # == INFORMAR UM CPF VÁLIDO DE ACORDO COM A QUANTIDADE DE NÚMEROS E SE HÁ APENAS NÚMEROS ==
+                    print('Escreva apenas números EX: (01234567891)')
+                    continue
+                cpf = int(cpf)
+                if not len(str(cpf)) == 11:
+                    print('Escreva 11 números EX: (01234567891)')
+                    continue
+                break
+            checagem_cpf = "SELECT cpf FROM cadastros WHERE cpf = %s" # == CHECAR SE O CPF JÁ ESTÁ CADASTRADO ==
+            cursor.execute(checagem_cpf, (cpf,))
+            resultado = cursor.fetchall()
+            if len(resultado) != 0:
+                print('Esse CPF já está cadastrado')
+                while True:
+                    logado2 = input('Digite 1, se você já tem login\nDigite 2 caso tenha digitado errado e queira repetir: ')
+                    if not logado2.isdigit(): # == O USUÁRIO ESCOLHE SE QUER RETORNAR AO LOGIN COM ESSE CPF OU REPETIR A DIGITAÇÃO DE CPF ==
+                        print('Digite apenas "1" ou "2"')
+                        continue
+                    logado2 = int(logado2)
+                    if not logado2 >= 1 and logado2 <= 2:
+                        print('Digite apenas "1" ou "2"')
+                        continue
+                    if logado2 == 1:
+                        login()
+                        exit()   # == TENTAR LOGAR NOVAMENTE ==
+                        break
+                    if logado2 == 2:
+                        cadastro()
+                        exit()    # == REPETIR O CPF ==
+                        break
+                    break
+            while True:
+                senha = input('Qual vai ser sua senha ?\nA senha deve conter exatamente 4 números: ')
+                if not senha.isdigit():
+                    print('Escreva apenas números, no formato (1234)')
+                    continue    # == CRIAÇÃO DE SENHA ATRAVÉS DOS FORMATOS VÁLIDOS ( APENAS NÚMEROS E 4 DÍGITOS ) ==
+                senha = int(senha)
+                if not len(str(senha)) == 4:
+                    print('Escreva exatamente 4 números, no formato (1234)')
+                    continue
+                break
+            codigo = randint(999, 10000) # == GERAÇÃO DE UM CÓDIGO PESSOAL ALEATÓRIO PARA RECUPERAÇÃO DE SENHA E OUTROS SERVIÇOS ==
+            adicionar = f'INSERT INTO cadastros (cpf, senha, codigo) VALUE ({cpf}, {senha}, {codigo})' # == CREATE DE INFORMAÇÕES NO BANCO DE DADOS ==
+            cursor.execute(adicionar)
+            conexao.commit()
+            print(f'\033[31mFOI CRIADO UM CÓDIGO PESSOAL PARA VOCÊ USAR EM CASO DE RECUPERAÇÃO DE SENHA, NÃO O PERCA!\nSEU CÓDIGO É {codigo}\033[0m')
+            print('Você foi cadastrado com sucesso!\nAgora você retornará ao login, e escreva seus dados cadastrados')
+            login() # == IDA AO LOGIN PARA ENTRAR NA SUA CONTA ==
+            exit()
+
                         
+
+# == FUNÇÃO VER RESTAURANTES ==
+def ver_restaurantes():
+                print('Estamos lhe redirecionando para a página de restaurantes participantes!')
+                time.sleep(1)
+                opcoes = 'SELECT restaurante FROM restaurantes' # == LEITURA ( READ ) DOS RESTAURANTES CADASTRADOS NO BANCO DE DADOS ==
+                cursor.execute(opcoes)
+                resultado = cursor.fetchall()
+                while True:
+                    for i, row in enumerate(resultado, start=1):
+                        print(f'Restaurante {i} : {row[0]}') # == IMPRESSÃO DOS RESTAURANTES PARTICIPANTES ==
+                    escolha = input('Escolha entre as três opções disponíveis:\nDigite 1,2 ou 3: ')
+                    if escolha == '1': # == PIZZARIA ==
+                        cursor.execute("SELECT prato_principal FROM restaurantes WHERE restaurante = 'Pizzaria'") # == LEITURA DO PRATO ==
+                        prato_pizzaria = cursor.fetchone()
+                        prato_pizzaria = prato_pizzaria[0]
+                        print(f'Bem-vindo à Pizzaria!\n\nEsse é o prato principal : {prato_pizzaria}\n')
+                        decisao = input('Digite SIM caso queira realizar o pedido ou retornará ao menu: ') 
+                        while True:
+                            if decisao.upper() == 'SIM':
+                                cursor.execute("SELECT Valor FROM restaurantes WHERE restaurante = 'Pizzaria'") # == LEITURA DO VALOR ==
+                                valor_pizza = cursor.fetchone()
+                                time.sleep(1)
+                                print(f'O valor do seu pedido é de\nR${valor_pizza[0]}')
+                                confirmar_compra = input('Digite sua senha para confirmar a compra: ') # == VERIFICAÇÃO FINAL DE COMPRA ATRAVÉS DA SENHA ==
+                                verificacao_senha = ('SELECT * FROM cadastros WHERE senha = %s')
+                                cursor.execute(verificacao_senha, (confirmar_compra,))
+                                resultado_senha = cursor.fetchall()
+                            else:
+                                print('Você está sendo redirecionado para o menu!')
+                                time.sleep(1)
+                                menu_f()
+                                
+                            
+                            if resultado_senha:
+                                consulta_credito = 'SELECT credito FROM cadastros WHERE senha = %s'
+                                cursor.execute(consulta_credito, (confirmar_compra,))
+                                resultado = cursor.fetchone()
+                                credito = int(resultado[0])
+                                if credito >= 45: # == VERIFICAR SE O USUÁRIO POSSUI CRÉDITOS SUFICIENTES ATRAVÉS DE UMA CONSULTA AO BANCO DE DADOS ==
+                                    print('Estamos processando-o...')
+                                    time.sleep(1)
+                                    credito_desconto = credito - 45
+                                    cursor.execute('UPDATE cadastros SET credito = %s WHERE senha = %s', (credito_desconto, confirmar_compra)) # == UPDATE DOS CRÉDITOS SUBTRAIDOS PELO VALOR DO PRATO ==
+                                    conexao.commit()
+                                    cursor.execute('SELECT ticketpizzaria FROM cadastros WHERE senha = %s', (confirmar_compra, )) # TESTE PARA GERAR TICKETS !!!
+                                    resultado_qtdatual = cursor.fetchone()
+                                    resultado_format = int(resultado_qtdatual[0])
+                                    qtd_ticket_atual = (resultado_format) + 1
+                                    cursor.execute('UPDATE cadastros SET ticketpizzaria = %s WHERE senha = %s', (qtd_ticket_atual, confirmar_compra))
+                                    conexao.commit()
+                                    print('Compra realizada com sucesso e Ticket gerado\nEstamos lhe redirecionando para o menu..')
+                                    time.sleep(1)
+                                    
+                                    break
+                                else:
+                                    add_credito = True
+                                    while add_credito: # == PERGUNTAR AO USUÁRIO SE ELE QUER ADICIONAR CRÉDITOS OU RETORNAR AO MENU ==
+                                        decisao_credito = input('Você não tem créditos para realizar essa compra!\nDigite 1 para adicionar créditos ou 2 para retornar ao menu: ')
+                                        if decisao_credito == '1':
+                                            creditos_add()
+                                            ver_restaurantes()
+                                        elif decisao_credito == '2':
+                                            print('Você está sendo redirecionado para o menu...')
+                                            time.sleep(1)
+                                            
+                                            menu_f()
+                                        else:
+                                            print('Tente uma opção válida!')
+                            else:
+                                print('Senha não válida, tente novamente')
+                                
+                    elif escolha == '2': # == HAMBURGUERIA ==
+                        cursor.execute("SELECT prato_principal FROM restaurantes WHERE restaurante = 'Hamburgueria'") # == LEITURA DO PRATO ==
+                        prato_hamburgueria = cursor.fetchone() 
+                        print(f'Bem-vindo à Hamburgueria!\n\nEsse é o prato principal : {prato_hamburgueria[0]}\n')
+                        decisao = input('Digite SIM caso queira realizar o pedido ou retornará ao menu: ')
+                        while True:
+                            if decisao.upper() == 'SIM':
+                                cursor.execute("SELECT Valor FROM restaurantes WHERE restaurante = 'Hamburgueria'") # == LEITURA DO VALOR ==
+                                valor_hamburguer = cursor.fetchone()
+                                time.sleep(1)
+                                print(f'O valor do seu pedido é de\nR${valor_hamburguer[0]}')
+                                confirmar_compra = input('Digite sua senha para confirmar a compra: ') # == VERIFICAÇÃO DE SENHA ==
+                                verificacao_senha = ('SELECT * FROM cadastros WHERE senha = %s')
+                                cursor.execute(verificacao_senha, (confirmar_compra,))
+                                resultado_senha = cursor.fetchall()
+                            else:
+                                print('Você está sendo redirecionado para o menu!')
+                                time.sleep(1)
+                                menu_f()
+                            
+                            if resultado_senha:
+                                consulta_credito = 'SELECT credito FROM cadastros WHERE senha = %s'
+                                cursor.execute(consulta_credito, (confirmar_compra,))
+                                resultado = cursor.fetchone()
+                                credito = int(resultado[0])
+                                if credito >= 40: # == ANÁLISE PARA VER SE O USUÁRIO POSSUI CRÉDITO ==
+                                    print('Estamos processando-o...')
+                                    time.sleep(1)
+                                    credito_desconto = credito - 40 
+                                    cursor.execute('UPDATE cadastros SET credito = %s WHERE senha = %s', (credito_desconto, confirmar_compra))
+                                    conexao.commit() # == SUBTRAÇÃO DE CRÉDITOS DO USUÁRIO DE ACORDO COM O VALOR DO PEDIDO ==
+                                    cursor.execute('SELECT tickethamburgueria FROM cadastros WHERE senha = %s', (confirmar_compra, )) # TESTE PARA GERAR TICKETS !!!
+                                    resultado_qtdatual = cursor.fetchone()
+                                    resultado_format = int(resultado_qtdatual[0])
+                                    qtd_ticket_atual = (resultado_format) + 1
+                                    cursor.execute('UPDATE cadastros SET tickethamburgueria = %s WHERE senha = %s', (qtd_ticket_atual, confirmar_compra))
+                                    conexao.commit()
+                                    print('Compra realizada com sucesso e Ticket gerado\nEstamos lhe redirecionando para o menu..')
+                                    time.sleep(1)
+                                    
+                                    break
+                                else:
+                                    add_credito = True
+                                    while add_credito:
+                                        decisao_credito = input('Você não tem créditos para realizar essa compra!\nDigite 1 para adicionar créditos ou 2 para retornar ao menu: ')
+                                        if decisao_credito == '1':
+                                            creditos_add() 
+                                            ver_restaurantes()
+                                        elif decisao_credito == '2':
+                                            print('Você está sendo redirecionado para o menu...')
+                                            time.sleep(1)
+                                            
+                                            menu_f()
+                                        else:
+                                            print('Tente uma opção válida!')
+                            else:
+                                print('Senha não válida, tente novamente')
+
+                    elif escolha == '3': # == COMIDA BR ==
+                        cursor.execute("SELECT prato_principal FROM restaurantes WHERE restaurante = 'Comida Brasileira'") # == LEITURA DE PRATO ==
+                        prato_comidabr = cursor.fetchone()
+                        print(f'Bem-vindo ao restaurante de comida brasileira!\n\nEsse é o prato principal :{prato_comidabr[0]}\n')
+                        decisao = input('Digite SIM caso queira realizar o pedido ou retornará ao menu: ')
+                        while True:
+                            if decisao.upper() == 'SIM':
+                                cursor.execute("SELECT Valor FROM restaurantes WHERE restaurante = 'Comida Brasileira'")
+                                valor_comidabr = cursor.fetchone() # == LEITURA DO VALOR ==
+                                time.sleep(1)
+                                print(f'O valor do seu pedido é de\nR${valor_comidabr[0]}') 
+                                confirmar_compra = input('Digite sua senha para confirmar a compra: ') # == VERIFICAÇÃO PELA SENHA ==
+                                verificacao_senha = ('SELECT * FROM cadastros WHERE senha = %s')
+                                cursor.execute(verificacao_senha, (confirmar_compra,))
+                                resultado_senha = cursor.fetchall()
+                            else:
+                                print('Você está sendo redirecionado para o menu!')
+                                time.sleep(1)
+                                menu_f()
+                            
+                            if resultado_senha:
+                                consulta_credito = 'SELECT credito FROM cadastros WHERE senha = %s'
+                                cursor.execute(consulta_credito, (confirmar_compra,))
+                                resultado = cursor.fetchone()
+                                credito = int(resultado[0])
+                                if credito >= 35: # == ANÁLISE DA SITUAÇÃO DE CRÉDITOS DO USUÁRIO ==
+                                    print('Estamos processando-o...')
+                                    time.sleep(1)
+                                    credito_desconto = credito - 35 # == UPDATE DOS CRÉDITOS ATUAIS - O VALOR DO PEDIDO ==
+                                    cursor.execute('UPDATE cadastros SET credito = %s WHERE senha = %s', (credito_desconto, confirmar_compra))
+                                    conexao.commit()
+                                    cursor.execute('SELECT ticketcomidabr FROM cadastros WHERE senha = %s', (confirmar_compra, )) # TESTE PARA GERAR TICKETS !!!
+                                    resultado_qtdatual = cursor.fetchone()
+                                    resultado_format = int(resultado_qtdatual[0])
+                                    qtd_ticket_atual = (resultado_format) + 1
+                                    cursor.execute('UPDATE cadastros SET ticketcomidabr = %s WHERE senha = %s', (qtd_ticket_atual, confirmar_compra))
+                                    conexao.commit()
+                                    print('Compra realizada com sucesso e Ticket gerado\nEstamos lhe redirecionando para o menu..')
+                                    time.sleep(1)
+                                    
+                                    break
+                                else:
+                                    add_credito = True
+                                    while add_credito:
+                                        decisao_credito = input('Você não tem créditos para realizar essa compra!\nDigite 1 para adicionar créditos ou 2 para retornar ao menu: ')
+                                        if decisao_credito == '1':
+                                            creditos_add()
+                                            ver_restaurantes()
+                                        elif decisao_credito == '2':
+                                            print('Você está sendo redirecionado para o menu...')
+                                            time.sleep(1)
+                                            
+                                            menu_f()
+                                        else:
+                                            print('Tente uma opção válida!')
+                            else:
+                                print('Senha não válida, tente novamente')   
+                    else:
+                        print('Digite uma opção válida de restaurante')
+                    break
                 menu_f()
 
 # == MENU INTERATIVO COM 5 OPÇÕES DISPONÍVEIS ==
@@ -138,187 +386,13 @@ def menu_f():
         # == VER CRÉDITO ==
         elif opcao_menu == '2': 
             creditos_add()
+            menu_f()
          
         # == VER RESTAURANTES ==
 
         elif opcao_menu == '3':
-            print('Estamos lhe redirecionando para a página de restaurantes participantes!')
-            time.sleep(1)
-            opcoes = 'SELECT restaurante FROM restaurantes' # == LEITURA ( READ ) DOS RESTAURANTES CADASTRADOS NO BANCO DE DADOS ==
-            cursor.execute(opcoes)
-            resultado = cursor.fetchall()
-            while True:
-                for i, row in enumerate(resultado, start=1):
-                    print(f'Restaurante {i} : {row[0]}') # == IMPRESSÃO DOS RESTAURANTES PARTICIPANTES ==
-                escolha = input('Escolha entre as três opções disponíveis:\nDigite 1,2 ou 3: ')
-                if escolha == '1': # == PIZZARIA ==
-                    cursor.execute("SELECT prato_principal FROM restaurantes WHERE restaurante = 'Pizzaria'") # == LEITURA DO PRATO ==
-                    prato_pizzaria = cursor.fetchone()
-                    prato_pizzaria = prato_pizzaria[0]
-                    print(f'Bem-vindo à Pizzaria!\n\nEsse é o prato principal : {prato_pizzaria}\n')
-                    decisao = input('Digite SIM caso queira realizar o pedido ou retornará ao menu: ') 
-                    while True:
-                        if decisao.upper() == 'SIM':
-                            cursor.execute("SELECT Valor FROM restaurantes WHERE restaurante = 'Pizzaria'") # == LEITURA DO VALOR ==
-                            valor_pizza = cursor.fetchone()
-                            time.sleep(1)
-                            print(f'O valor do seu pedido é de R${valor_pizza[0]}')
-                            confirmar_compra = input('Digite sua senha para confirmar a compra: ') # == VERIFICAÇÃO FINAL DE COMPRA ATRAVÉS DA SENHA ==
-                            verificacao_senha = ('SELECT * FROM cadastros WHERE senha = %s')
-                            cursor.execute(verificacao_senha, (confirmar_compra,))
-                            resultado_senha = cursor.fetchall()
-                        else:
-                            print('Você está sendo redirecionado para o menu!')
-                            time.sleep(1)
-                            menu_f()
-                        
-                        if resultado_senha:
-                            consulta_credito = 'SELECT credito FROM cadastros WHERE senha = %s'
-                            cursor.execute(consulta_credito, (confirmar_compra,))
-                            resultado = cursor.fetchone()
-                            credito = int(resultado[0])
-                            if credito >= 45: # == VERIFICAR SE O USUÁRIO POSSUI CRÉDITOS SUFICIENTES ATRAVÉS DE UMA CONSULTA AO BANCO DE DADOS ==
-                                print('Estamos processando-o...')
-                                time.sleep(1)
-                                credito_desconto = credito - 45
-                                cursor.execute('UPDATE cadastros SET credito = %s WHERE senha = %s', (credito_desconto, confirmar_compra)) # == UPDATE DOS CRÉDITOS SUBTRAIDOS PELO VALOR DO PRATO ==
-                                conexao.commit()
-                                cursor.execute('SELECT ticketpizzaria FROM cadastros WHERE senha = %s', (confirmar_compra, )) # TESTE PARA GERAR TICKETS !!!
-                                resultado_qtdatual = cursor.fetchone()
-                                resultado_format = int(resultado_qtdatual[0])
-                                qtd_ticket_atual = (resultado_format) + 1
-                                cursor.execute('UPDATE cadastros SET ticketpizzaria = %s WHERE senha = %s', (qtd_ticket_atual, confirmar_compra))
-                                conexao.commit()
-                                print('Compra realizada com sucesso e Ticket gerado\nEstamos lhe redirecionando para o menu..')
-                                time.sleep(1)
-                                break
-                            else:
-                                add_credito = True
-                                while add_credito: # == PERGUNTAR AO USUÁRIO SE ELE QUER ADICIONAR CRÉDITOS OU RETORNAR AO MENU ==
-                                    decisao_credito = input('Você não tem créditos para realizar essa compra!\nDigite 1 para adicionar créditos ou 2 para retornar ao menu: ')
-                                    if decisao_credito == '1':
-                                       creditos_add() 
-                                    elif decisao_credito == '2':
-                                       print('Você está sendo redirecionado para o menu...')
-                                       time.sleep(1)
-                                       menu_f()
-                                    else:
-                                        print('Tente uma opção válida!')
-                        else:
-                            print('Senha não válida, tente novamente')
-                            
-                elif escolha == '2': # == HAMBURGUERIA ==
-                    cursor.execute("SELECT prato_principal FROM restaurantes WHERE restaurante = 'Hamburgueria'") # == LEITURA DO PRATO ==
-                    prato_hamburgueria = cursor.fetchone() 
-                    print(f'Bem-vindo à Hamburgueria!\n\nEsse é o prato principal : {prato_hamburgueria[0]}\n')
-                    decisao = input('Digite SIM caso queira realizar o pedido ou retornará ao menu: ')
-                    while True:
-                        if decisao.upper() == 'SIM':
-                            cursor.execute("SELECT Valor FROM restaurantes WHERE restaurante = 'Hamburgueria'") # == LEITURA DO VALOR ==
-                            valor_hamburguer = cursor.fetchone()
-                            time.sleep(1)
-                            print(f'O valor do seu pedido é de R${valor_hamburguer[0]}')
-                            confirmar_compra = input('Digite sua senha para confirmar a compra: ') # == VERIFICAÇÃO DE SENHA ==
-                            verificacao_senha = ('SELECT * FROM cadastros WHERE senha = %s')
-                            cursor.execute(verificacao_senha, (confirmar_compra,))
-                            resultado_senha = cursor.fetchall()
-                        else:
-                            print('Você está sendo redirecionado para o menu!')
-                            time.sleep(1)
-                            menu_f()
-                        
-                        if resultado_senha:
-                            consulta_credito = 'SELECT credito FROM cadastros WHERE senha = %s'
-                            cursor.execute(consulta_credito, (confirmar_compra,))
-                            resultado = cursor.fetchone()
-                            credito = int(resultado[0])
-                            if credito >= 40: # == ANÁLISE PARA VER SE O USUÁRIO POSSUI CRÉDITO ==
-                                print('Estamos processando-o...')
-                                time.sleep(1)
-                                credito_desconto = credito - 40 
-                                cursor.execute('UPDATE cadastros SET credito = %s WHERE senha = %s', (credito_desconto, confirmar_compra))
-                                conexao.commit() # == SUBTRAÇÃO DE CRÉDITOS DO USUÁRIO DE ACORDO COM O VALOR DO PEDIDO ==
-                                cursor.execute('SELECT tickethamburgueria FROM cadastros WHERE senha = %s', (confirmar_compra, )) # TESTE PARA GERAR TICKETS !!!
-                                resultado_qtdatual = cursor.fetchone()
-                                resultado_format = int(resultado_qtdatual[0])
-                                qtd_ticket_atual = (resultado_format) + 1
-                                cursor.execute('UPDATE cadastros SET tickethamburgueria = %s WHERE senha = %s', (qtd_ticket_atual, confirmar_compra))
-                                conexao.commit()
-                                print('Compra realizada com sucesso e Ticket gerado\nEstamos lhe redirecionando para o menu..')
-                                time.sleep(1)
-                                break
-                            else:
-                                add_credito = True
-                                while add_credito:
-                                    decisao_credito = input('Você não tem créditos para realizar essa compra!\nDigite 1 para adicionar créditos ou 2 para retornar ao menu: ')
-                                    if decisao_credito == '1':
-                                       creditos_add() 
-                                    elif decisao_credito == '2':
-                                       print('Você está sendo redirecionado para o menu...')
-                                       time.sleep(1)
-                                       menu_f()
-                                    else:
-                                        print('Tente uma opção válida!')
-                        else:
-                            print('Senha não válida, tente novamente')
-                elif escolha == '3': # == COMIDA BR ==
-                    cursor.execute("SELECT prato_principal FROM restaurantes WHERE restaurante = 'Comida Brasileira'") # == LEITURA DE PRATO ==
-                    prato_comidabr = cursor.fetchone()
-                    print(f'Bem-vindo ao restaurante de comida brasileira!\nEsse é o prato principal : {prato_comidabr[0]}')
-                    decisao = input('Digite SIM caso queira realizar o pedido ou retornará ao menu: ')
-                    while True:
-                        if decisao.upper() == 'SIM':
-                            cursor.execute("SELECT Valor FROM restaurantes WHERE restaurante = 'Comida Brasileira'")
-                            valor_comidabr = cursor.fetchone() # == LEITURA DO VALOR ==
-                            time.sleep(1)
-                            print(f'O valor do seu pedido é de R${valor_comidabr[0]}') 
-                            confirmar_compra = input('Digite sua senha para confirmar a compra: ') # == VERIFICAÇÃO PELA SENHA ==
-                            verificacao_senha = ('SELECT * FROM cadastros WHERE senha = %s')
-                            cursor.execute(verificacao_senha, (confirmar_compra,))
-                            resultado_senha = cursor.fetchall()
-                        else:
-                            print('Você está sendo redirecionado para o menu!')
-                            time.sleep(1)
-                            menu_f()
-                        
-                        if resultado_senha:
-                            consulta_credito = 'SELECT credito FROM cadastros WHERE senha = %s'
-                            cursor.execute(consulta_credito, (confirmar_compra,))
-                            resultado = cursor.fetchone()
-                            credito = int(resultado[0])
-                            if credito >= 35: # == ANÁLISE DA SITUAÇÃO DE CRÉDITOS DO USUÁRIO ==
-                                print('Estamos processando-o...')
-                                time.sleep(1)
-                                credito_desconto = credito - 35 # == UPDATE DOS CRÉDITOS ATUAIS - O VALOR DO PEDIDO ==
-                                cursor.execute('UPDATE cadastros SET credito = %s WHERE senha = %s', (credito_desconto, confirmar_compra))
-                                conexao.commit()
-                                cursor.execute('SELECT ticketcomidabr FROM cadastros WHERE senha = %s', (confirmar_compra, )) # TESTE PARA GERAR TICKETS !!!
-                                resultado_qtdatual = cursor.fetchone()
-                                resultado_format = int(resultado_qtdatual[0])
-                                qtd_ticket_atual = (resultado_format) + 1
-                                cursor.execute('UPDATE cadastros SET ticketcomidabr = %s WHERE senha = %s', (qtd_ticket_atual, confirmar_compra))
-                                conexao.commit()
-                                print('Compra realizada com sucesso e Ticket gerado\nEstamos lhe redirecionando para o menu..')
-                                time.sleep(1)
-                                break
-                            else:
-                                add_credito = True
-                                while add_credito:
-                                    decisao_credito = input('Você não tem créditos para realizar essa compra!\nDigite 1 para adicionar créditos ou 2 para retornar ao menu: ')
-                                    if decisao_credito == '1':
-                                       creditos_add() 
-                                    elif decisao_credito == '2':
-                                       print('Você está sendo redirecionado para o menu...')
-                                       time.sleep(1)
-                                       menu_f()
-                                    else:
-                                        print('Tente uma opção válida!')
-                        else:
-                            print('Senha não válida, tente novamente')   
-                else:
-                    print('Digite uma opção válida de restaurante')
-                break
-            menu_f() 
+            ver_restaurantes()
+            
 
         # == VER TICKET ==
         elif opcao_menu == '4':
@@ -548,4 +622,23 @@ def login():
                     login() # == IDA AO LOGIN PARA ENTRAR NA SUA CONTA ==
                     exit()
                 cadastro()
-login()
+
+# == INICIO DO PROGRAMA ==
+
+iniciar = True
+while iniciar:
+    inicio = input('Bem vindo à Fastake!!\nO que você deseja fazer?\n1 - Cadastrar Usuário\n2 - Login\nEscolha entre as opções disponíveis: ')
+    if inicio == '1':
+        print('Você está sendo redirecionado para o cadastro!')
+        time.sleep(1)
+        cadastro()
+        break
+    elif inicio == '2':
+        print('Você está sendo redirecionado para o login!')
+        time.sleep(1)
+        login()
+        break
+    else:
+        print('Digite uma opção válida!')
+        time.sleep(1)
+        continue
