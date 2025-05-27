@@ -1,6 +1,6 @@
 # == CONEXÃO COM BANCO DE DADOS DO MYSQL ==
 # == OBS.: CONEXÃO DO BANCO DE DADOS NA NUVEM EM ANDAMENTO... ==
-import funcoes_fastake
+#from funcoes_fastake import login, cadastro, ver_restaurantes, menu_f, creditos_add
 import mysql.connector
 import time
 from random import randint
@@ -108,7 +108,6 @@ def cadastro():
                 if not senha.isdigit():
                     print('Escreva apenas números, no formato (1234)')
                     continue    # == CRIAÇÃO DE SENHA ATRAVÉS DOS FORMATOS VÁLIDOS ( APENAS NÚMEROS E 4 DÍGITOS ) ==
-                senha = int(senha)
                 if not len(str(senha)) == 4:
                     print('Escreva exatamente 4 números, no formato (1234)')
                     continue
@@ -343,8 +342,8 @@ def menu_f():
                     print('Seu código foi validado com sucesso!')
                     time.sleep(1)
                     try:
-                        nova_senha = int((input('Digite aqui sua nova senha (4 dígitos): ')))
-                        if 999 < nova_senha < 10000: # == VERIFICAÇÃO PARA SENHA DE 4 DÍGITOS ==
+                        nova_senha = (input('Digite aqui sua nova senha (4 dígitos): '))
+                        if len(nova_senha) == 4 and nova_senha.isdigit(): # == VERIFICAÇÃO PARA SENHA DE 4 DÍGITOS ==
                             comando_novasenha = f'UPDATE cadastros SET senha = %s WHERE codigo = %s' # == UPDATE DA SENHA NO BANCO DE DADOS ==
                             cursor.execute(comando_novasenha, (nova_senha, codigo_trocar))
                             conexao.commit()
@@ -361,11 +360,11 @@ def menu_f():
                             senha_invalida = True
                             while senha_invalida: # == LOOP PARA, ENQUANTO A SENHA NÃO CONTER AS RESTRIÇÕES, SOLICITAR AO USUÁRIO NOVAMENTE A SENHA ==
                                 try:
-                                    nova_senha = int(input('Tente novamente: '))
-                                    if nova_senha > 999 and nova_senha < 10000:
+                                    nova_senha = (input('Tente novamente: '))
+                                    if len(nova_senha) == 4 and nova_senha.isdigit():
                                         time.sleep(1)
                                         comando_novasenha = f'UPDATE cadastros SET senha = {nova_senha} WHERE codigo = %s' # == UPDATE NO BANCO DE DADOS ==
-                                        cursor.execute(comando_novasenha, (codigo_trocar))
+                                        cursor.execute(comando_novasenha, (codigo_trocar,))
                                         conexao.commit()
                                         print('Senha salva com sucesso!')
                                         time.sleep(1)
@@ -455,7 +454,7 @@ def menu_f():
                 comando = 'DELETE FROM cadastros WHERE cpf = %s ' # == DELETE DA CONTA NO BANCO DE DADOS ==
                 cursor.execute(comando, (cpf,))
                 conexao.commit()
-                print('Conta deletada com sucesso!\n Você está sendo redirecionado para a página de login')
+                print('Conta deletada com sucesso!\nVocê está sendo redirecionado para a página inicial')
                 time.sleep(1)
             else:
                 while decisao_invalida:
@@ -464,13 +463,12 @@ def menu_f():
                         comando = 'DELETE FROM cadastros WHERE cpf = %s'
                         cursor.execute(comando, (cpf,)) # == DELETE DA CONTA NO BANCO DE DADOS ==
                         conexao.commit()
-                        print('Conta deletada com sucesso!\nVocê está sendo redirecionado para a página inicial')
+                        print('Conta deletada com sucesso!\nVocê está sendo redirecionado para a página inicial ')
                         time.sleep(1)
                         break
                     else:
                         print('Tente novamente')
                         time.sleep(1)
-        
             inicio()
         elif opcao_menu == '6':
             login()
@@ -497,8 +495,8 @@ def login():
         if not senha.isdigit(): # == VERIFICAÇÃO SE HÁ APENAS NÚMEROS ==
             print('Escreva apenas números EX: (1234)')
             continue
-        senha = int(senha)
-        if not len(str(senha)) == 4: # == VERIFICAÇÃO DA QUANTIDADE DE DÍGITOS DO CPF ==
+        senha = senha
+        if not len(str(senha)) == 4: # == VERIFICAÇÃO DA QUANTIDADE DE DÍGITOS DA SENHA ==
             print('Escreva exatamente 4 digitos EX: (1234)')
             continue
         checagem_cpf = "SELECT cpf FROM cadastros WHERE cpf = %s" # == CHECAR EXISTÊNCIA DO CPF NO BANCO DE DADOS ==
@@ -601,18 +599,19 @@ def login():
                                 break
                             break
                     while True:
-                        senha = input('Qual vai ser sua senha ?\nA senha deve conter exatamente 4 números: ')
+                        senha = str(input('Qual vai ser sua senha ?\nA senha deve conter exatamente 4 números: '))
                         if not senha.isdigit():
                             print('Escreva apenas números, no formato (1234)')
                             continue    # == CRIAÇÃO DE SENHA ATRAVÉS DOS FORMATOS VÁLIDOS ( APENAS NÚMEROS E 4 DÍGITOS ) ==
-                        senha = int(senha)
                         if not len(str(senha)) == 4:
                             print('Escreva exatamente 4 números, no formato (1234)')
                             continue
                         break
+                    cpf = str(cpf)
+                    senha = str(senha)
                     codigo = randint(999, 10000) # == GERAÇÃO DE UM CÓDIGO PESSOAL ALEATÓRIO PARA RECUPERAÇÃO DE SENHA E OUTROS SERVIÇOS ==
-                    adicionar = f'INSERT INTO cadastros (cpf, senha, codigo) VALUE ({cpf}, {senha}, {codigo})' # == CREATE DE INFORMAÇÕES NO BANCO DE DADOS ==
-                    cursor.execute(adicionar)
+                    adicionar = f'INSERT INTO cadastros (cpf, senha, codigo) VALUES (%s, %s, %s)' # == CREATE DE INFORMAÇÕES NO BANCO DE DADOS ==
+                    cursor.execute(adicionar, (cpf, senha, codigo))
                     conexao.commit()
                     print(f'\033[31mFOI CRIADO UM CÓDIGO PESSOAL PARA VOCÊ USAR EM CASO DE RECUPERAÇÃO DE SENHA, NÃO O PERCA!\nSEU CÓDIGO É {codigo}\033[0m')
                     print('Você foi cadastrado com sucesso!\nAgora você retornará ao login, e escreva seus dados cadastrados')
