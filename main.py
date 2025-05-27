@@ -464,17 +464,14 @@ def menu_f():
                         comando = 'DELETE FROM cadastros WHERE cpf = %s'
                         cursor.execute(comando, (cpf,)) # == DELETE DA CONTA NO BANCO DE DADOS ==
                         conexao.commit()
-                        print('Conta deletada com sucesso!\nVocê está sendo redirecionado para a página de login ')
+                        print('Conta deletada com sucesso!\nVocê está sendo redirecionado para a página inicial')
                         time.sleep(1)
                         break
                     else:
                         print('Tente novamente')
                         time.sleep(1)
         
-            #delete, DELETE ( DELETE FROM cadastros WHERE cpf = "{cpf}")
-            # cadastros = tabela-alvo
-            # cpf = coluna-alvo e onde apagar
-            login()
+            inicio()
         elif opcao_menu == '6':
             login()
         else:
@@ -624,21 +621,22 @@ def login():
                 cadastro()
 
 # == INICIO DO PROGRAMA ==
-
-iniciar = True
-while iniciar:
-    inicio = input('Bem vindo à Fastake!!\nO que você deseja fazer?\n1 - Cadastrar Usuário\n2 - Login\nEscolha entre as opções disponíveis: ')
-    if inicio == '1':
-        print('Você está sendo redirecionado para o cadastro!')
-        time.sleep(1)
-        cadastro()
-        break
-    elif inicio == '2':
-        print('Você está sendo redirecionado para o login!')
-        time.sleep(1)
-        login()
-        break
-    else:
-        print('Digite uma opção válida!')
-        time.sleep(1)
-        continue
+def inicio():
+    iniciar = True
+    while iniciar:
+        inicio = input('Bem vindo à Fastake!!\nO que você deseja fazer?\n1 - Cadastrar Usuário\n2 - Login\nEscolha entre as opções disponíveis: ')
+        if inicio == '1':
+            print('Você está sendo redirecionado para o cadastro!')
+            time.sleep(1)
+            cadastro()
+            break
+        elif inicio == '2':
+            print('Você está sendo redirecionado para o login!')
+            time.sleep(1)
+            login()
+            break
+        else:
+            print('Digite uma opção válida!')
+            time.sleep(1)
+            continue
+inicio()
