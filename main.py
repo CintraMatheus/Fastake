@@ -29,7 +29,7 @@ def creditos_add():
                         print(f'Você tem {credito_atual} créditos')
                         time.sleep(1)
 
-                        add = input('Você deseja adicionar mais créditos? Digite SIM para adicionar: ')
+                        add = input('Você deseja adicionar mais créditos? Digite SIM para adicionar ou irá para o menu: ')
                         if add.upper() == 'SIM':
                             quantia = int(input('Digite a quantia desejada, em R$: \n'))
                             quantia_nova = credito_atual + quantia
@@ -425,7 +425,7 @@ def menu_f():
                     print('Estamos carregando seus tickets...')
                     time.sleep(1)
                     print(f'Você tem:\n{qtd_ticket_pizzaria} tickets na Pizzaria!\n{qtd_ticket_hamburgueria} tickets na Hamburgueria!\n{qtd_ticket_comida_br} tickets na Comida Brasileira!')
-                    decisao_ticket = input('Deseja retornar ao menu? Digite 1 para retornar : ')
+                    decisao_ticket = input('Deseja retornar ao menu? Digite 1 para retornar ou voltará para o início dessa aba : ')
                     if decisao_ticket == '1':
                         menu_f()
                         break
