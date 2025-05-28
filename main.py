@@ -460,7 +460,7 @@ def menu_f():
                         print('Escreva seu CPF correto: ')
                         time.sleep(1) 
                         continue  
-            decisao_delete = str(input('Digite SIM para confirmar a exclusão da conta: ')) # == CONFIRMAÇÃO DE EXCLUSÃO ==
+            decisao_delete = str(input('Digite SIM para confirmar a exclusão da conta ou NAO para retornar ao menu: ')) # == CONFIRMAÇÃO DE EXCLUSÃO ==
             decisao_invalida = True
             if decisao_delete.upper() == 'SIM':
                 comando = 'DELETE FROM cadastros WHERE cpf = %s ' # == DELETE DA CONTA NO BANCO DE DADOS ==
@@ -468,7 +468,13 @@ def menu_f():
                 conexao.commit()
                 print('Conta deletada com sucesso!\nVocê está sendo redirecionado para a página inicial')
                 time.sleep(1)
+            elif decisao_delete.upper() == 'NAO':
+                print('Você está sendo redirecionado para o menu!')
+                menu_f()
+                break
             else:
+                print('Tente novamente uma opção válida!')
+                time.sleep(1)
                 while decisao_invalida:
                     decisao_delete2 = str(input('Digite SIM para confirmar a exclusão da conta ou NAO para retornar ao menu! '))
                     if decisao_delete2.upper() == 'SIM':
