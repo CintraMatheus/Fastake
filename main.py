@@ -5,10 +5,10 @@ import mysql.connector
 import time
 from random import randint
 conexao = mysql.connector.connect(
-    host = 'sql10.freesqldatabase.com',
-    user = 'sql10780881',
-    password = 'xUqWWm3vPM',
-    database = 'sql10780881',
+    host = 'localhost',
+    user = 'root',
+    password = '2710',
+    database = 'fastake_project',
 )
 cursor = conexao.cursor()
 
