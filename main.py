@@ -113,8 +113,8 @@ def cadastro():
                     continue
                 break
             codigo = randint(999, 10000) # == GERAÇÃO DE UM CÓDIGO PESSOAL ALEATÓRIO PARA RECUPERAÇÃO DE SENHA E OUTROS SERVIÇOS ==
-            adicionar = f'INSERT INTO cadastros (cpf, senha, codigo) VALUE ({cpf}, {senha}, {codigo})' # == CREATE DE INFORMAÇÕES NO BANCO DE DADOS ==
-            cursor.execute(adicionar)
+            adicionar = f'INSERT INTO cadastros (cpf, senha, codigo) VALUE (%s, %s, %s)' # == CREATE DE INFORMAÇÕES NO BANCO DE DADOS ==
+            cursor.execute(adicionar, (cpf, senha, codigo))
             conexao.commit()
             print(f'\033[31mFOI CRIADO UM CÓDIGO PESSOAL PARA VOCÊ USAR EM CASO DE RECUPERAÇÃO DE SENHA, NÃO O PERCA!\nSEU CÓDIGO É {codigo}\033[0m')
             print('Você foi cadastrado com sucesso!\nAgora você retornará ao login, e escreva seus dados cadastrados')
@@ -139,7 +139,7 @@ def ver_restaurantes():
                         prato_pizzaria = cursor.fetchone()
                         prato_pizzaria = prato_pizzaria[0]
                         print(f'Bem-vindo à Pizzaria!\n\nEsse é o prato principal : {prato_pizzaria}\n')
-                        decisao = input('Digite SIM caso queira realizar o pedido ou retornará ao menu: ') 
+                        decisao = input('Digite SIM caso queira realizar o pedido ou NAO para retornar ao menu: ') 
                         while True:
                             if decisao.upper() == 'SIM':
                                 cursor.execute("SELECT Valor FROM restaurantes WHERE restaurante = 'Pizzaria'") # == LEITURA DO VALOR ==
@@ -150,10 +150,14 @@ def ver_restaurantes():
                                 verificacao_senha = ('SELECT * FROM cadastros WHERE senha = %s')
                                 cursor.execute(verificacao_senha, (confirmar_compra,))
                                 resultado_senha = cursor.fetchall()
-                            else:
+                            elif decisao.upper() == 'NAO':
                                 print('Você está sendo redirecionado para o menu!')
                                 time.sleep(1)
                                 menu_f()
+                                break
+                            else:
+                                print('Tente uma opção válida!')
+                                time.sleep(1)
                                 
                             
                             if resultado_senha:
@@ -198,7 +202,7 @@ def ver_restaurantes():
                         cursor.execute("SELECT prato_principal FROM restaurantes WHERE restaurante = 'Hamburgueria'") # == LEITURA DO PRATO ==
                         prato_hamburgueria = cursor.fetchone() 
                         print(f'Bem-vindo à Hamburgueria!\n\nEsse é o prato principal : {prato_hamburgueria[0]}\n')
-                        decisao = input('Digite SIM caso queira realizar o pedido ou retornará ao menu: ')
+                        decisao = input('Digite SIM caso queira realizar o pedido ou NAO para retornar ao menu: ')
                         while True:
                             if decisao.upper() == 'SIM':
                                 cursor.execute("SELECT Valor FROM restaurantes WHERE restaurante = 'Hamburgueria'") # == LEITURA DO VALOR ==
@@ -209,10 +213,14 @@ def ver_restaurantes():
                                 verificacao_senha = ('SELECT * FROM cadastros WHERE senha = %s')
                                 cursor.execute(verificacao_senha, (confirmar_compra,))
                                 resultado_senha = cursor.fetchall()
-                            else:
+                            elif decisao.upper() == 'NAO':
                                 print('Você está sendo redirecionado para o menu!')
                                 time.sleep(1)
                                 menu_f()
+                                break
+                            else:
+                                print('Tente uma opção válida!')
+                                time.sleep(1)
                             
                             if resultado_senha:
                                 consulta_credito = 'SELECT credito FROM cadastros WHERE senha = %s'
@@ -256,7 +264,7 @@ def ver_restaurantes():
                         cursor.execute("SELECT prato_principal FROM restaurantes WHERE restaurante = 'Comida Brasileira'") # == LEITURA DE PRATO ==
                         prato_comidabr = cursor.fetchone()
                         print(f'Bem-vindo ao restaurante de comida brasileira!\n\nEsse é o prato principal :{prato_comidabr[0]}\n')
-                        decisao = input('Digite SIM caso queira realizar o pedido ou retornará ao menu: ')
+                        decisao = input('Digite SIM caso queira realizar o pedido ou NAO para retornar ao menu: ')
                         while True:
                             if decisao.upper() == 'SIM':
                                 cursor.execute("SELECT Valor FROM restaurantes WHERE restaurante = 'Comida Brasileira'")
@@ -267,10 +275,14 @@ def ver_restaurantes():
                                 verificacao_senha = ('SELECT * FROM cadastros WHERE senha = %s')
                                 cursor.execute(verificacao_senha, (confirmar_compra,))
                                 resultado_senha = cursor.fetchall()
-                            else:
+                            elif decisao.upper() == 'NAO':
                                 print('Você está sendo redirecionado para o menu!')
                                 time.sleep(1)
                                 menu_f()
+                                break
+                            else:
+                                print('Tente novamente!')
+                                time.sleep(1)
                             
                             if resultado_senha:
                                 consulta_credito = 'SELECT credito FROM cadastros WHERE senha = %s'
@@ -458,7 +470,7 @@ def menu_f():
                 time.sleep(1)
             else:
                 while decisao_invalida:
-                    decisao_delete2 = str(input('Digite SIM para confirmar a exclusão da conta: '))
+                    decisao_delete2 = str(input('Digite SIM para confirmar a exclusão da conta ou NAO para retornar ao menu! '))
                     if decisao_delete2.upper() == 'SIM':
                         comando = 'DELETE FROM cadastros WHERE cpf = %s'
                         cursor.execute(comando, (cpf,)) # == DELETE DA CONTA NO BANCO DE DADOS ==
@@ -466,8 +478,12 @@ def menu_f():
                         print('Conta deletada com sucesso!\nVocê está sendo redirecionado para a página inicial ')
                         time.sleep(1)
                         break
+                    elif decisao_delete2.upper() == 'NAO':
+                        menu_f()
+                        time.sleep(1)
+                        break
                     else:
-                        print('Tente novamente')
+                        print('Tente novamente uma opção válida!')
                         time.sleep(1)
             inicio()
         elif opcao_menu == '6':
