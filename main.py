@@ -4,11 +4,12 @@
 import mysql.connector
 import time
 from random import randint
+import funcoes_fastake
 conexao = mysql.connector.connect(
-    host = 'sql10.freesqldatabase.com',
-    user = 'sql10780881',
-    password = 'xUqWWm3vPM',
-    database = 'sql10780881'
+    host = 'localhost',
+    user = 'root',
+    password = '2710',
+    database = 'fastake_project'
 )
 cursor = conexao.cursor()
 
@@ -120,8 +121,7 @@ def cadastro():
             print('Você foi cadastrado com sucesso!\nAgora você retornará ao login, e escreva seus dados cadastrados')
             login() # == IDA AO LOGIN PARA ENTRAR NA SUA CONTA ==
             exit()
-
-                        
+               
 
 # == FUNÇÃO VER RESTAURANTES ==
 def ver_restaurantes():
@@ -344,56 +344,59 @@ def menu_f():
         # == TROCAR SENHA ==
 
         if opcao_menu == '1':
-            verificacao_codigo = True
-            while verificacao_codigo:
-                codigo_trocar = int(input('Digite seu código de segurança: '))
-                consulta = 'SELECT * FROM cadastros WHERE codigo = %s'
-                cursor.execute(consulta, (codigo_trocar,)) # == VERIFICAÇÃO A PARTIR DO CÓDIGO DE SEGURANÇA DO USUÁRIO ==
-                resultado = cursor.fetchone()
-                if resultado:
-                    print('Seu código foi validado com sucesso!')
-                    time.sleep(1)
-                    try:
-                        nova_senha = (input('Digite aqui sua nova senha (4 dígitos): '))
-                        if len(nova_senha) == 4 and nova_senha.isdigit(): # == VERIFICAÇÃO PARA SENHA DE 4 DÍGITOS ==
-                            comando_novasenha = f'UPDATE cadastros SET senha = %s WHERE codigo = %s' # == UPDATE DA SENHA NO BANCO DE DADOS ==
-                            cursor.execute(comando_novasenha, (nova_senha, codigo_trocar))
-                            conexao.commit()
-                            time.sleep(1)
-                            print('Senha salva com sucesso!\nVocê está sendo redirecionado para o menu')
-                            time.sleep(1)
-                            verificacao_codigo = False
-                            menu = True
-                        else:
-                            raise ValueError
-                    except ValueError: # == ERRO TRATÁVEL PARA SENHA QUE CONTER CARACTERES ( STRINGS ) ==
-                            print('Senha inválida!')
-                            time.sleep(1)
-                            senha_invalida = True
-                            while senha_invalida: # == LOOP PARA, ENQUANTO A SENHA NÃO CONTER AS RESTRIÇÕES, SOLICITAR AO USUÁRIO NOVAMENTE A SENHA ==
-                                try:
-                                    nova_senha = (input('Tente novamente: '))
-                                    if len(nova_senha) == 4 and nova_senha.isdigit():
-                                        time.sleep(1)
-                                        comando_novasenha = f'UPDATE cadastros SET senha = {nova_senha} WHERE codigo = %s' # == UPDATE NO BANCO DE DADOS ==
-                                        cursor.execute(comando_novasenha, (codigo_trocar,))
-                                        conexao.commit()
-                                        print('Senha salva com sucesso!')
-                                        time.sleep(1)
-                                        print('Você está sendo redirecionado para o menu!')
-                                        time.sleep(1)
-                                        senha_invalida = False
-                                        menu = True
-                                        verificacao_codigo = False
-                                    else:
-                                        print('Senha deve ter 4 dígitos!')
-                                        senha_invalida = True
-                                except ValueError:
-                                    print('Você deve digitar apenas números')
-                else:
-                    print('Código inválido, tente novamente')
-                    time.sleep(1)
-            menu_f()
+            def trocar_senha():
+
+                verificacao_codigo = True
+                while verificacao_codigo:
+                    codigo_trocar = int(input('Digite seu código de segurança: '))
+                    consulta = 'SELECT * FROM cadastros WHERE codigo = %s'
+                    cursor.execute(consulta, (codigo_trocar,)) # == VERIFICAÇÃO A PARTIR DO CÓDIGO DE SEGURANÇA DO USUÁRIO ==
+                    resultado = cursor.fetchone()
+                    if resultado:
+                        print('Seu código foi validado com sucesso!')
+                        time.sleep(1)
+                        try:
+                            nova_senha = (input('Digite aqui sua nova senha (4 dígitos): '))
+                            if len(nova_senha) == 4 and nova_senha.isdigit(): # == VERIFICAÇÃO PARA SENHA DE 4 DÍGITOS ==
+                                comando_novasenha = f'UPDATE cadastros SET senha = %s WHERE codigo = %s' # == UPDATE DA SENHA NO BANCO DE DADOS ==
+                                cursor.execute(comando_novasenha, (nova_senha, codigo_trocar))
+                                conexao.commit()
+                                time.sleep(1)
+                                print('Senha salva com sucesso!\nVocê está sendo redirecionado para o menu')
+                                time.sleep(1)
+                                verificacao_codigo = False
+                                menu = True
+                            else:
+                                raise ValueError
+                        except ValueError: # == ERRO TRATÁVEL PARA SENHA QUE CONTER CARACTERES ( STRINGS ) ==
+                                print('Senha inválida!')
+                                time.sleep(1)
+                                senha_invalida = True
+                                while senha_invalida: # == LOOP PARA, ENQUANTO A SENHA NÃO CONTER AS RESTRIÇÕES, SOLICITAR AO USUÁRIO NOVAMENTE A SENHA ==
+                                    try:
+                                        nova_senha = (input('Tente novamente: '))
+                                        if len(nova_senha) == 4 and nova_senha.isdigit():
+                                            time.sleep(1)
+                                            comando_novasenha = f'UPDATE cadastros SET senha = {nova_senha} WHERE codigo = %s' # == UPDATE NO BANCO DE DADOS ==
+                                            cursor.execute(comando_novasenha, (codigo_trocar,))
+                                            conexao.commit()
+                                            print('Senha salva com sucesso!')
+                                            time.sleep(1)
+                                            print('Você está sendo redirecionado para o menu!')
+                                            time.sleep(1)
+                                            senha_invalida = False
+                                            menu = True
+                                            verificacao_codigo = False
+                                        else:
+                                            print('Senha deve ter 4 dígitos!')
+                                            senha_invalida = True
+                                    except ValueError:
+                                        print('Você deve digitar apenas números')
+                    else:
+                        print('Código inválido, tente novamente')
+                        time.sleep(1)
+                menu_f()
+                trocar_senha()
         # == VER CRÉDITO ==
         elif opcao_menu == '2': 
             creditos_add()
@@ -407,98 +410,102 @@ def menu_f():
 
         # == VER TICKET ==
         elif opcao_menu == '4':
-            ticket = True
-            while ticket:
-                senha_verificar = input('Digite aqui sua senha para continuar: ')
-                cursor.execute('SELECT * FROM cadastros WHERE senha = %s', (senha_verificar,))
-                resultado = cursor.fetchall()
-                if resultado:
-                    cursor.execute('SELECT ticketpizzaria FROM cadastros WHERE senha = %s', (senha_verificar,))
-                    resultado_pizzaria = cursor.fetchall()
-                    cursor.execute('SELECT tickethamburgueria FROM cadastros WHERE senha = %s', (senha_verificar,))
-                    resultado_hamburgueria = cursor.fetchall()
-                    cursor.execute('SELECT ticketcomidabr FROM cadastros WHERE senha = %s', (senha_verificar,))
-                    resultado_comida_br = cursor.fetchall()
-                    qtd_ticket_pizzaria = int(resultado_pizzaria[0][0])
-                    qtd_ticket_hamburgueria = int(resultado_hamburgueria[0][0])
-                    qtd_ticket_comida_br = int(resultado_comida_br[0][0])
-                    print('Estamos carregando seus tickets...')
-                    time.sleep(1)
-                    print(f'Você tem:\n{qtd_ticket_pizzaria} tickets na Pizzaria!\n{qtd_ticket_hamburgueria} tickets na Hamburgueria!\n{qtd_ticket_comida_br} tickets na Comida Brasileira!')
-                    decisao_ticket = input('Deseja retornar ao menu? Digite 1 para retornar ou voltará para o início dessa aba : ')
-                    if decisao_ticket == '1':
-                        menu_f()
-                        break
-                    else:
-                        print('Estamos lhe redirecionando para o início dessa aba!')
+            def Ver_ticket():
+
+                ticket = True
+                while ticket:
+                    senha_verificar = input('Digite aqui sua senha para continuar: ')
+                    cursor.execute('SELECT * FROM cadastros WHERE senha = %s', (senha_verificar,))
+                    resultado = cursor.fetchall()
+                    if resultado:
+                        cursor.execute('SELECT ticketpizzaria FROM cadastros WHERE senha = %s', (senha_verificar,))
+                        resultado_pizzaria = cursor.fetchall()
+                        cursor.execute('SELECT tickethamburgueria FROM cadastros WHERE senha = %s', (senha_verificar,))
+                        resultado_hamburgueria = cursor.fetchall()
+                        cursor.execute('SELECT ticketcomidabr FROM cadastros WHERE senha = %s', (senha_verificar,))
+                        resultado_comida_br = cursor.fetchall()
+                        qtd_ticket_pizzaria = int(resultado_pizzaria[0][0])
+                        qtd_ticket_hamburgueria = int(resultado_hamburgueria[0][0])
+                        qtd_ticket_comida_br = int(resultado_comida_br[0][0])
+                        print('Estamos carregando seus tickets...')
                         time.sleep(1)
-                else:
-                    print('Senha inválida, digite novamente')
-            menu_f()
+                        print(f'Você tem:\n{qtd_ticket_pizzaria} tickets na Pizzaria!\n{qtd_ticket_hamburgueria} tickets na Hamburgueria!\n{qtd_ticket_comida_br} tickets na Comida Brasileira!')
+                        decisao_ticket = input('Deseja retornar ao menu? Digite 1 para retornar ou voltará para o início dessa aba : ')
+                        if decisao_ticket == '1':
+                            menu_f()
+                            break
+                        else:
+                            print('Estamos lhe redirecionando para o início dessa aba!')
+                            time.sleep(1)
+                    else:
+                        print('Senha inválida, digite novamente')
+                menu_f()
+            Ver_ticket()
 
         # == DELETAR CONTA ==
 
         elif opcao_menu == '5':
-            cpf = str((input('Digite o CPF da conta a ser apagada: '))) # == VERIFICAÇÃO POR CPF ==
-            consulta2 = 'SELECT * FROM cadastros WHERE cpf = %s'
-            cursor.execute(consulta2, (cpf,))
-            resultado = cursor.fetchone()
-            if resultado:
-                print('CPF validado!')
-                time.sleep(1)
-            else:
-                while True: # == LOOP PARA SOLICITAR UM CPF VÁLIDO ATÉ O USUÁRIO ACERTAR ==
-                    cpf = str((input('Digite novamente um CPF válido!')))
-                    consulta3 = 'SELECT * FROM cadastros WHERE cpf = %s'
-                    cursor.execute(consulta3, (cpf,))
-                    resultado = cursor.fetchone()
-                    if resultado:
-                        print('CPF validado!')
-                        time.sleep(1)
-                        False
-                    else:
-                        print('Escreva seu CPF correto: ')
-                        time.sleep(1) 
-                        continue  
-            decisao_delete = str(input('Digite SIM para confirmar a exclusão da conta ou NAO para retornar ao menu: ')) # == CONFIRMAÇÃO DE EXCLUSÃO ==
-            decisao_invalida = True
-            if decisao_delete.upper() == 'SIM':
-                comando = 'DELETE FROM cadastros WHERE cpf = %s ' # == DELETE DA CONTA NO BANCO DE DADOS ==
-                cursor.execute(comando, (cpf,))
-                conexao.commit()
-                print('Conta deletada com sucesso!\nVocê está sendo redirecionado para a página inicial')
-                time.sleep(1)
-            elif decisao_delete.upper() == 'NAO':
-                print('Você está sendo redirecionado para o menu!')
-                menu_f()
-                break
-            else:
-                print('Tente novamente uma opção válida!')
-                time.sleep(1)
-                while decisao_invalida:
-                    decisao_delete2 = str(input('Digite SIM para confirmar a exclusão da conta ou NAO para retornar ao menu! '))
-                    if decisao_delete2.upper() == 'SIM':
-                        comando = 'DELETE FROM cadastros WHERE cpf = %s'
-                        cursor.execute(comando, (cpf,)) # == DELETE DA CONTA NO BANCO DE DADOS ==
-                        conexao.commit()
-                        print('Conta deletada com sucesso!\nVocê está sendo redirecionado para a página inicial ')
-                        time.sleep(1)
-                        break
-                    elif decisao_delete2.upper() == 'NAO':
-                        menu_f()
-                        time.sleep(1)
-                        break
-                    else:
-                        print('Tente novamente uma opção válida!')
-                        time.sleep(1)
-            inicio()
+            def deletar_conta():
+
+                cpf = str((input('Digite o CPF da conta a ser apagada: '))) # == VERIFICAÇÃO POR CPF ==
+                consulta2 = 'SELECT * FROM cadastros WHERE cpf = %s'
+                cursor.execute(consulta2, (cpf,))
+                resultado = cursor.fetchone()
+                if resultado:
+                    print('CPF validado!')
+                    time.sleep(1)
+                else:
+                    while True: # == LOOP PARA SOLICITAR UM CPF VÁLIDO ATÉ O USUÁRIO ACERTAR ==
+                        cpf = str((input('Digite novamente um CPF válido!')))
+                        consulta3 = 'SELECT * FROM cadastros WHERE cpf = %s'
+                        cursor.execute(consulta3, (cpf,))
+                        resultado = cursor.fetchone()
+                        if resultado:
+                            print('CPF validado!')
+                            time.sleep(1)
+                            False
+                        else:
+                            print('Escreva seu CPF correto: ')
+                            time.sleep(1) 
+                            continue  
+                decisao_delete = str(input('Digite SIM para confirmar a exclusão da conta ou NAO para retornar ao menu: ')) # == CONFIRMAÇÃO DE EXCLUSÃO ==
+                decisao_invalida = True
+                if decisao_delete.upper() == 'SIM':
+                    comando = 'DELETE FROM cadastros WHERE cpf = %s ' # == DELETE DA CONTA NO BANCO DE DADOS ==
+                    cursor.execute(comando, (cpf,))
+                    conexao.commit()
+                    print('Conta deletada com sucesso!\nVocê está sendo redirecionado para a página inicial')
+                    time.sleep(1)
+                elif decisao_delete.upper() == 'NAO':
+                    print('Você está sendo redirecionado para o menu!')
+                    menu_f()
+                else:
+                    print('Tente novamente uma opção válida!')
+                    time.sleep(1)
+                    while decisao_invalida:
+                        decisao_delete2 = str(input('Digite SIM para confirmar a exclusão da conta ou NAO para retornar ao menu! '))
+                        if decisao_delete2.upper() == 'SIM':
+                            comando = 'DELETE FROM cadastros WHERE cpf = %s'
+                            cursor.execute(comando, (cpf,)) # == DELETE DA CONTA NO BANCO DE DADOS ==
+                            conexao.commit()
+                            print('Conta deletada com sucesso!\nVocê está sendo redirecionado para a página inicial ')
+                            time.sleep(1)
+                            break
+                        elif decisao_delete2.upper() == 'NAO':
+                            menu_f()
+                            time.sleep(1)
+                            break
+                        else:
+                            print('Tente novamente uma opção válida!')
+                            time.sleep(1)
+                inicio()
+            deletar_conta()
         elif opcao_menu == '6':
             login()
         else:
             print('Tente uma opção válida!')
             time.sleep(1)
 
-#MENU!!!
 
 def login():
     #retorna ao login quando quiser
@@ -642,6 +649,7 @@ def login():
                 cadastro()
 
 # == INICIO DO PROGRAMA ==
+
 def inicio():
     iniciar = True
     while iniciar:
@@ -660,4 +668,4 @@ def inicio():
             print('Digite uma opção válida!')
             time.sleep(1)
             continue
-inicio()
+funcoes_fastake.inicio()
