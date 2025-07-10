@@ -2,22 +2,61 @@ import mysql.connector
 import time
 from random import randint
 from unidecode import unidecode
-
+from email_validator import EmailNotValidError, validate_email
+import funções_ADM as fa
 
 # Remove the global conexao and cursor from here in funcoes_fastake.py
 # as they will be passed into the functions.
 
 # == INICIO DO PROGRAMA ==
-def inicio(conexao, cursor): # Add cursor as an argument
-    iniciar = True
-    while iniciar:
-        inicio = input('Bem vindo à Fastake!!\nO que você deseja fazer?\n1 - Cadastrar Usuário\n2 - Login\nEscolha entre as opções disponíveis: ')
-        if inicio == '1':
+def inicio(conexao, cursor):
+    while True:
+        escolha = input("Bem vindo à Fastake!\n" \
+        "Se deseja ir para a parte de adiministradores: digite 1\n" \
+        "Se deseja ir para a parte de usuários: digite 2\n")
+        if escolha == '1':
+            print('Você está sendo redirecionado para a página de administrador!')
+            time.sleep(1)
+            adm(conexao, cursor) # Pass conexao and cursor
+            break
+        elif escolha == '2':
+            print('Você está sendo redirecionado para a página de usuário!')
+            time.sleep(1)
+            user(conexao, cursor) # Pass conexao and cursor
+            break
+        else:
+            print('Digite uma opção válida!')
+            time.sleep(1)
+            continue
+
+def adm(conexao, cursor):
+    while True:
+        escolha = input('Bem vindo administrador!\nO que você deseja fazer?\n1 - Cadastrar Usuário\n2 - Login\nEscolha entre as opções disponíveis: ')
+        if escolha == '1':
+            print('Você está sendo redirecionado para o cadastro!')
+            time.sleep(1)
+            fa.Adm.cadastro_adm(conexao, cursor) # Pass conexao and cursor
+            break
+        elif escolha == '2':
+            print('Você está sendo redirecionado para o login!')
+            time.sleep(1)
+            fa.Adm.login_adm(conexao, cursor) # Pass conexao and cursor
+            break
+        else:
+            print('Digite uma opção válida!')
+            time.sleep(1)
+            continue
+
+def user(conexao, cursor): # Add cursor as an argument
+    user = True
+    while user:
+        escolha = input('Bem vindo usuário!\nO que você deseja fazer?\n1 - Cadastrar Usuário\n2 - Login\nEscolha entre as opções disponíveis: ')
+        if escolha == '1':
             print('Você está sendo redirecionado para o cadastro!')
             time.sleep(1)
             cadastro(conexao, cursor) # Pass conexao and cursor
             break
-        elif inicio == '2':
+        elif escolha == '2':
             print('Você está sendo redirecionado para o login!')
             time.sleep(1)
             login(conexao, cursor) # Pass conexao and cursor
@@ -220,7 +259,7 @@ def menu_f(conexao, cursor): # Add conexao and cursor as arguments
                                     valor_prato = cursor.fetchone()
                                     time.sleep(1)
                                     print(f'O valor do seu pedido é de: R${valor_prato}')
-                                    if checar_senha(conexao, cursor, cpf):
+                                    if checar_senha_usuario(conexao, cursor, cpf):
                                         cursor.execute(f'SELECT credito FROM cadastros WHERE cpf = %s', (cpf))
                                         resultado = cursor.fetchone()
                                         if int(resultado) >= int(valor_prato): # == VERIFICAR SE O USUÁRIO POSSUI CRÉDITOS SUFICIENTES ATRAVÉS DE UMA CONSULTA AO BANCO DE DADOS ==
@@ -504,9 +543,9 @@ def cadastro(conexao, cursor): # Add conexao and cursor as arguments
     login(conexao, cursor) # Pass conexao and cursor # == IDA AO LOGIN PARA ENTRAR NA SUA CONTA ==
     return # Exit function
 
-def checar_senha(conexao, cursor, cpf):
+def checar_senha_usuario(conexao, cursor, cpf, senha_checagem):
     while True:
-        senha_checagem = input('Digite sua senha para continuar: ')
+        senha_checagem = input("Defina sua senha (a senha deve conter 4 números EX: 1234: )")
         if not senha_checagem.isdigit():
             print('Escreva apenas números, no formato (1234)')
             continue
@@ -519,3 +558,10 @@ def checar_senha(conexao, cursor, cpf):
     if senha_checagem == senha_certa:
         return True
     else: return False
+
+def validar_modelo_email(email):
+    try:
+        valid = validate_email(email)
+        return True, valid.email
+    except EmailNotValidError as e:
+        return False, str(e)
