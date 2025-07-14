@@ -1,4 +1,4 @@
-import funcoes_fastake as fk
+
 import mysql.connector
 import time
 from usuario import Usuario

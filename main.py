@@ -1,11 +1,11 @@
-import funcoes_fastake as fk
+
 import mysql.connector
 import time
 from usuario import Usuario
-from usuario import inicio
 from restaurantes import Restaurantes
-from random import randint
 import sessao
+from adm import adm
+from adm import Admin
 
 conexao = mysql.connector.connect(
     host = 'localhost',
@@ -16,21 +16,37 @@ conexao = mysql.connector.connect(
 cursor = conexao.cursor()
 
 while True:
-    global usuario
-    inicio = input('=== Bem vindo à Fastake!! ===\nO que você deseja fazer?\n1 - Cadastrar Usuário\n2 - Login\nEscolha entre as opções disponíveis: ')
-    if inicio == '1':
-        print(' === Bem-vindo à aba de cadastro ===')
-        sessao.usuario_cadastrado = Usuario.cadastrar()
-
-    elif inicio == '2':
-        login = True
-        while login:
-            print('Você está sendo redirecionado para o login!')
-            time.sleep(1)
-            sessao.usuario_logado = Usuario.fazer_login()
-            time.sleep(1)
-            break
-           
+        
+    escolha = input("Bem vindo à Fastake!\n" \
+    "Se deseja ir para a parte de adiministradores: digite 1\n" \
+    "Se deseja ir para a parte de usuários: digite 2\n")
+    if escolha == '1':
+        print('Você está sendo redirecionado para a página de administrador!')
+        time.sleep(1)
+        adm() # Pass conexao and cursor
+        break
+    elif escolha == '2':
+        print('Você está sendo redirecionado para a página de usuário!')
+        time.sleep(1)
+        user = True
+        while user:
+            escolha = input('Bem vindo usuário!\nO que você deseja fazer?\n1 - Cadastrar Usuário\n2 - Login\nEscolha entre as opções disponíveis: ')
+            if escolha == '1':
+                print('Você está sendo redirecionado para o cadastro!')
+                time.sleep(1)
+                sessao.usuario_cadastrado = Usuario.cadastrar() # Pass conexao and cursor
+                break
+            elif escolha == '2':
+                print('Você está sendo redirecionado para o login!')
+                time.sleep(1)
+                sessao.usuario_logado = Usuario.fazer_login() # Pass conexao and cursor
+                break
+            else:
+                print('Digite uma opção válida!')
+                time.sleep(1)
+                continue
+        
+    
         while True:
             opcoes_menu = (
             '1 - Trocar senha'

@@ -1,9 +1,9 @@
-import funcoes_fastake as fk
+
 import mysql.connector
 import time
 from random import randint
 from unidecode import unidecode
-
+from adm import Admin
 conexao = mysql.connector.connect(
     host = 'localhost',
     user = 'root',
@@ -445,22 +445,45 @@ class Usuario:
             return
 
 
-def inicio():
 
-    """ Função para retornar ao início do programa """
 
-    iniciar = True
-    while iniciar:
-        inicio = input('=== Bem vindo à Fastake!! ===\nO que você deseja fazer?\n1 - Cadastrar Usuário\n2 - Login\nEscolha entre as opções disponíveis: ')
-        if inicio == '1':
+
+
+
+def user(): # Add cursor as an argument
+    user = True
+    while user:
+        escolha = input('Bem vindo usuário!\nO que você deseja fazer?\n1 - Cadastrar Usuário\n2 - Login\nEscolha entre as opções disponíveis: ')
+        if escolha == '1':
             print('Você está sendo redirecionado para o cadastro!')
             time.sleep(1)
-            Usuario.cadastrar()
-            
-        elif inicio == '2':
+            Usuario.cadastrar() # Pass conexao and cursor
+            break
+        elif escolha == '2':
             print('Você está sendo redirecionado para o login!')
             time.sleep(1)
-            Usuario.fazer_login()
+            Usuario.fazer_login() # Pass conexao and cursor
+            break
+        else:
+            print('Digite uma opção válida!')
+            time.sleep(1)
+            continue
+
+
+def inicio():
+    while True:
+        escolha = input("Bem vindo à Fastake!\n" \
+        "Se deseja ir para a parte de adiministradores: digite 1\n" \
+        "Se deseja ir para a parte de usuários: digite 2\n")
+        if escolha == '1':
+            print('Você está sendo redirecionado para a página de administrador!')
+            time.sleep(1)
+            Admin.adm() # Pass conexao and cursor
+            break
+        elif escolha == '2':
+            print('Você está sendo redirecionado para a página de usuário!')
+            time.sleep(1)
+            user() # Pass conexao and cursor
             break
         else:
             print('Digite uma opção válida!')
