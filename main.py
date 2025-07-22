@@ -4,8 +4,14 @@ import time
 from usuario import Usuario
 from restaurantes import Restaurantes
 import sessao
-from adm import adm
+
 from adm import Admin
+from rich.panel import Panel
+from rich import print
+from rich.console import Console
+from rich.progress import track
+from rich.table import Table
+from rich.layout import Layout
 
 conexao = mysql.connector.connect(
     host = 'localhost',
@@ -14,49 +20,62 @@ conexao = mysql.connector.connect(
     database = 'fastake'
 )
 cursor = conexao.cursor()
-
+console = Console()
 while True:
         
-    escolha = input("Bem vindo à Fastake!\n" \
-    "Se deseja ir para a parte de adiministradores: digite 1\n" \
-    "Se deseja ir para a parte de usuários: digite 2\n")
+    console.print(Panel('Bem-Vindo à Fastake, Para onde quer ser redirecionado?', style='bold'))
+    console.print(Panel('1 - Ir para a aba de Administrador', style='green'))
+    console.print(Panel('2 - Ir para a aba de Usuário', style='green'))
+    escolha = console.input('[bold]Digite aqui: [/]')
     if escolha == '1':
-        print('Você está sendo redirecionado para a página de administrador!')
+        console.print('[bold]Você está sendo redirecionado para a página de administrador![/]')
         time.sleep(1)
-        adm() # Pass conexao and cursor
+        Admin.adm() # Pass conexao and cursor
         break
     elif escolha == '2':
-        print('Você está sendo redirecionado para a página de usuário!')
+        console.print('[bold]Você está sendo redirecionado para a página de usuário![/]')
         time.sleep(1)
         user = True
         while user:
-            escolha = input('Bem vindo usuário!\nO que você deseja fazer?\n1 - Cadastrar Usuário\n2 - Login\nEscolha entre as opções disponíveis: ')
+            console.print(Panel('O que deseja fazer?', style='bold'))
+            console.print(Panel('1 - Ir para o cadastro', style='blue'))
+            console.print(Panel('2 - Ir para o login', style='green'))
+
+            escolha = console.input('[bold]Digite aqui: [/]')
             if escolha == '1':
-                print('Você está sendo redirecionado para o cadastro!')
+                console.print('[bold]Você está sendo redirecionado para o cadastro![/]')
                 time.sleep(1)
                 sessao.usuario_cadastrado = Usuario.cadastrar() # Pass conexao and cursor
-                break
+                continue
             elif escolha == '2':
-                print('Você está sendo redirecionado para o login!')
+                console.print('[bold]Você está sendo redirecionado para o login![/]')
                 time.sleep(1)
                 sessao.usuario_logado = Usuario.fazer_login() # Pass conexao and cursor
                 break
             else:
-                print('Digite uma opção válida!')
+                console.print('[bold]Digite uma opção válida![/]')
                 time.sleep(1)
                 continue
         
     
         while True:
-            opcoes_menu = (
-            '1 - Trocar senha'
-            '\n2 - Ver crédito'
-            '\n3 - Ver restaurantes'
-            '\n4 - Ver tickets'
-            '\n5 - Deletar conta'
-            '\n6 - Ir para página de login'
+            menu = (
+                '[bold]\n1 - :lock: Trocar senha[/]'
+                '[bold]\n2 - :money_with_wings: Ver crédito[/]'
+                '[bold]\n3 - :fork_and_knife: Ver restaurantes[/]'
+                '[bold]\n4 - :ticket: Ver tickets[/]'
+                '[bold]\n5 - :wastebasket: Deletar conta[/]'
+                '[bold]\n6 - :door: Ir para página de login[/]'
+                '[bold]\n7 - :door: Ir para o início do sistema[/]')
+            mensagem = f'[bold]Escolha uma opção no menu abaixo.[/]\n{menu}'
+            panel = Panel(
+                mensagem,
+                title="[bold green]Menu Interativo[/]",
+                subtitle="Fastake 1.0",
+                border_style="bright_blue"
             )
-            opcao_menu = input(str(f' === Menu ===:\n{opcoes_menu}\nDigite aqui uma opção válida: '))
+            console.print(panel)
+            opcao_menu = console.input(str('[bold]Digite aqui uma opção válida: [/]'))
                 # == TROCAR SENHA ==
             if opcao_menu == '1':
                 sessao.usuario_logado.trocar_senha()
@@ -89,11 +108,16 @@ while True:
             elif opcao_menu == '6':
                 time.sleep(1)
                 break
+            elif opcao_menu == '7':
+                from usuario import inicio
+                inicio()
+                user = False
+                break
             else:
-                print('Digite uma opção válida!')
+                console.print('[bold]Digite uma opção válida![/]')
                 time.sleep(1)
                 continue
     else:
-        print('Digite uma opção válida!')
+        console.print('[bold]Digite uma opção válida![/]')
         time.sleep(1)
         continue
