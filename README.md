@@ -109,7 +109,7 @@ Quando o usuário comprar ticket do restaurante, o dinheiro é atribuido à cont
 4 - Rich:
         - Biblioteca usada para estilizar o terminal e deixá-lo mais agradável, intuitivo e chamativo para o usuário.
 
-5 - EmailValidator
+5 - EmailValidator:
         - Utilizado para validar os emails dos administradores, na hora do cadastro, para garantir o formato correto : 'email@email.com'.
 
 ## Como executar
