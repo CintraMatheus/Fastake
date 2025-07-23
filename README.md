@@ -95,6 +95,22 @@ Quando o usuário comprar ticket do restaurante, o dinheiro é atribuido à cont
 
     - Como já foi dito na seção 2.2 da Metodologia e Desenvolvimento, a Orientação a Objetos do código é de suma importância para uma maior organização e estruturação do mesmo, trazendo especificidade e atribuição de características e ações a um mesmo objeto, evitando a confusão interna entre os fluxos de dados e a repetição de estruturas recorrentes dentro do sistema, a exemplo dos métodos, toda ação que um usuário pode realizar dentro da plataforma, que moldam a experiência do cliente e se repetem o tempo todo.
 
+## Bibliotecas  Utilizadas
+
+1 - MySQL:
+        - Biblioteca utilizada para gerenciar o banco de dados e manipular as informações inseridas.
+
+2 - Time:
+        - Utilizada para evitar a continuidade, sem espaçamento, do código, oferecendo uma maior interação com o usuário e as informações disponíveis.
+
+3 - Random: 
+        - Utilizada para gerar códigos aleatórios referentes a cadastros e tickets dos restaurantes.
+
+4 - Rich:
+        - Biblioteca usada para estilizar o terminal e deixá-lo mais agradável, intuitivo e chamativo para o usuário.
+
+5 - EmailValidator
+        - Utilizado para validar os emails dos administradores, na hora do cadastro, para garantir o formato correto : 'email@email.com'.
 
 ## Como executar
 
