@@ -113,19 +113,17 @@ Quando o usuário comprar ticket do restaurante, o dinheiro é atribuido à cont
         - Estilização do terminal para uma experiência agradável e atrativa para o usuário.
 ## Bibliotecas  Utilizadas
 
-1 - MySQL:
-        - Biblioteca utilizada para gerenciar o banco de dados e manipular as informações inseridas.
 
-2 - Time:
+1 - Time:
         - Utilizada para evitar a continuidade, sem espaçamento, do código, oferecendo uma maior interação com o usuário e as informações disponíveis.
 
-3 - Random: 
+2 - Random: 
         - Utilizada para gerar códigos aleatórios referentes a cadastros e tickets dos restaurantes.
 
-4 - Rich:
+3 - Rich:
         - Biblioteca usada para estilizar o terminal e deixá-lo mais agradável, intuitivo e chamativo para o usuário.
 
-5 - EmailValidator:
+4 - EmailValidator:
         - Utilizado para validar os emails dos administradores, na hora do cadastro, para garantir o formato correto : 'email@email.com'.
 
 ## Como executar
