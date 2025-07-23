@@ -95,6 +95,8 @@ Quando o usuário comprar ticket do restaurante, o dinheiro é atribuido à cont
 
     - Como já foi dito na seção 2.2 da Metodologia e Desenvolvimento, a Orientação a Objetos do código é de suma importância para uma maior organização e estruturação do mesmo, trazendo especificidade e atribuição de características e ações a um mesmo objeto, evitando a confusão interna entre os fluxos de dados e a repetição de estruturas recorrentes dentro do sistema, a exemplo dos métodos, toda ação que um usuário pode realizar dentro da plataforma, que moldam a experiência do cliente e se repetem o tempo todo.
 
+13 - Rich :
+        - Estilização do terminal para uma experiência agradável e atrativa para o usuário.
 ## Bibliotecas  Utilizadas
 
 1 - MySQL:
