@@ -449,7 +449,8 @@ class Usuario:
             break
 
     def ver_tickets(self):
-
+        cursor = conexao.cursor()
+        conexao.commit()
         ''' Impressão dos tickets de forma organizada e relacionada com o usuário, o ID do prato e o código gerado aleatoriamente '''
         console.print(Panel('[bold]:ticket: Bem-Vindo à aba de Tickets[/]'))
         time.sleep(1)

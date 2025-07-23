@@ -153,7 +153,7 @@ class Restaurantes:
                     cursor.execute(f'UPDATE cadastros SET credito = %s WHERE cpf = %s', (credito_desconto, self.cpf)) # == UPDATE DOS CRÉDITOS SUBTRAIDOS PELO VALOR DO PRATO ==
                     conexao.commit()
                     console.print(Panel('[green]Compra realizada com sucesso e Ticket gerado\nEstamos lhe redirecionando para o menu..[/]'))
-                    self.gerar_ticket(self.prato_escolhido, self.cpf)
+                    self.gerar_ticket(self.prato_escolhido, self.cpf, conexao)
                     final = False 
                 else:
                     add_credito = True
@@ -177,16 +177,19 @@ class Restaurantes:
                 console.print('[red]Senha não válida, tente novamente[/]')
                 continue
 
-    def gerar_ticket(self, prato_escolhido, cpf):
+    def gerar_ticket(self, prato_escolhido, cpf, conexao):
 
         ''' Gerador de ticket de acordo com o prato escolhido, o id do usuário ( lido através do seu CPF ) e de um código gerado aleatoriamente '''
-
+        cursor = conexao.cursor()
         cursor.execute(f'SELECT id FROM cadastros WHERE cpf = %s', (cpf,))
         id_usuario = cursor.fetchone()[0]
         id_prato = prato_escolhido[0]
         codigo_ticket = randint(10000, 99999)
         cursor.execute(f'INSERT INTO tickets (id_usuario, id_prato, codigo) VALUES (%s, %s, %s)', (id_usuario, id_prato, codigo_ticket))
         conexao.commit()
+        cursor.close()
+        
+        cursor = conexao.cursor()
         time.sleep(1)
         return
 
