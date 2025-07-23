@@ -1,5 +1,11 @@
 # Fastake
 
+![Fastake Logo](logo.png)
+
+
+
+
+
 Fastake é um software feito em python que vai tornar mais rápido, fácil e flexível a experiência de frequentar restaurantes, permitindo que usuários comprem tickets antecipadamente e evitem filas e esperas.
 
 O software se divide em 4 arquivos principais : 
