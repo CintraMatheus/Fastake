@@ -1,6 +1,20 @@
 # Fastake
 
-fastake é um software feito em python que vai tornar mais rápido, fácil e flexível a experiência de frequentar restaurantes, permitindo que usuários comprem tickets antecipadamente e evitem filas e esperas.
+Fastake é um software feito em python que vai tornar mais rápido, fácil e flexível a experiência de frequentar restaurantes, permitindo que usuários comprem tickets antecipadamente e evitem filas e esperas.
+
+O software se divide em 4 arquivos principais : 
+
+## adm.py
+Esse arquivo concentra as funções que o administrador pode realizar, desde o cadastro até a edição de restaurantes do mesmo, oferecendo organização e dividindo em métodos todas as ações do administrador.
+
+## usuario.py
+Esse arquivo concentra as funções que o usuário pode realizar, partindo do cadastro e login até a exclusão de conta e manipulação de dados, assim como a visualização de alterações realizadas pelo administrador nos restaurantes, em conjunto com o sistema de compra específico.
+
+## restaurantes.py
+Esse arquivo concentra as etapas percorridas, pelo usuário, ao entrar na aba de restaurantes, onde o mesmo pode ver os restaurantes, ver os seus pratos, finalizar a compra e gerar um ticket pessoal, onde será armazendo no banco de dados.
+
+## main.py
+Esse arquivo relaciona todos os outros em um só, por isso é tratado como principal, aplicando todos os métodos das classes e organizando de acordo com as escolhas que o usuário realiza ao longo do programa, oferecendo diferentes opções e experiências.
 
 ## Requisitos
 -Python 3.8 ou superior
