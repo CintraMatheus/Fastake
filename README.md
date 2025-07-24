@@ -43,6 +43,14 @@ O sistema possibilita que o administrador cadastre seu restaurante, adicione os 
 
 Quando o usuário comprar ticket do restaurante, o dinheiro é atribuido à conta cadastrada pelo administrador.
 
+
+![Fastake Menu](menu.png)
+
+
+## Imagem do menu interativo para o usuário comum, com todas as funções e ações  que o mesmo pode realizar
+
+
+
 ## Funcionalidades
 
 1 - Cadastro de usuário (CRUD Completo): 
