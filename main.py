@@ -50,7 +50,7 @@ while True:
             elif escolha == '2':
                 console.print('[bold]Você está sendo redirecionado para o login![/]')
                 time.sleep(1)
-                sessao.usuario_logado = Usuario.fazer_login() # Pass conexao and cursor
+                sessao.usuario_logado = Usuario.fazer_login(conexao, cursor) # Pass conexao and cursor
                 break
             else:
                 console.print('[bold]Digite uma opção válida![/]')

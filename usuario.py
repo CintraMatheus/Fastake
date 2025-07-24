@@ -145,7 +145,7 @@ class Usuario:
         self.codigo = codigo
 
     @classmethod
-    def fazer_login(cls):
+    def fazer_login(cls, conexao, cursor):
 
         ''' Login de um usuário já cadastrado '''
 
@@ -155,6 +155,10 @@ class Usuario:
             while True:
                 cpf = console.input('[green]Digite aqui seu CPF: [/]')
                 check.checar_cpf(cpf)
+                try:
+                    cursor.fetchall()
+                except:
+                    pass
                 checagem_cpf = "SELECT cpf FROM cadastros WHERE cpf = %s" # == CHECAR EXISTÊNCIA DO CPF NO BANCO DE DADOS ==
                 cursor.execute(checagem_cpf, (cpf,))
                 resultado = cursor.fetchall()
@@ -175,8 +179,13 @@ class Usuario:
             while True:
                 senha = console.input('[green]Digite aqui sua senha (4 dígitos): [/]')
                 check.checar_senha_login(senha)
+                try:
+                    cursor.fetchall()
+                except:
+                    pass
                 cursor.execute('SELECT * FROM cadastros WHERE cpf = %s AND senha = %s', (cpf, senha))
-                if not cursor.fetchone():
+                verify = cursor.fetchone()
+                if not verify:
                     decisao = True
                     while decisao: 
                         console.print('[bold]Senha incorreta, você esqueceu sua senha? Digite 1 para recupera-la ou 2 para tentar novamente: [/]')
@@ -199,12 +208,20 @@ class Usuario:
                             console.print('[red]Digite uma opção válida![/]')
                             time.sleep(1)
                             continue
+                else:
+                    verify = cursor.fetchone()
                 break
+            try:
+                cursor.fetchall()
+            except:
+                pass
+            cursor = conexao.cursor()
             cursor.execute(f'SELECT codigo FROM cadastros WHERE cpf = %s', (cpf,))
             codigo = cursor.fetchone()[0]
             with console.status('[bold]Processando as informações...[/]'):
                 time.sleep(3)
-            console.print('[green]Login realizado com sucesso![/]')
+            console.print('[green]Login realizado com sucesso!, estamos lhe redirecionando para o menu![/]')
+            menu()
             login = False
             return cls(cpf, senha, codigo)
     
@@ -229,10 +246,10 @@ class Usuario:
                 
                 cursor.execute('SELECT * FROM cadastros WHERE cpf = %s', (cpf,))
                 if cursor.fetchone():
-                    print('Este CPF já está cadastrado. Tente fazer login.\nEstamos lhe redirecionando para a página inicial...')
+                    console.print('[bold]Este CPF já está cadastrado. Tente fazer login.\nEstamos lhe redirecionando para a página inicial...[/]')
                     time.sleep(1)
                     inicio()
-                    cadastro = False
+                    return
                 break
 
             while True:
@@ -484,7 +501,7 @@ def user(): # Add cursor as an argument
     user = True
     while user:
         console.print(Panel('[bold]Bem-vindo usuário, o que você deseja fazer?[/]'))
-        console.print(Panel('[green]1 - Cadastro[/]'))
+        console.print(Panel('[blue]1 - Cadastro[/]'))
         console.print(Panel('[green]2 - Login[/]'))
         escolha = console.input('[bold]Digite aqui: [/]')
         if escolha == '1':
@@ -495,7 +512,7 @@ def user(): # Add cursor as an argument
         elif escolha == '2':
             console.print('[bold]Você está sendo redirecionado para o login![/]')
             time.sleep(1)
-            Usuario.fazer_login() # Pass conexao and cursor
+            Usuario.fazer_login(conexao, cursor) # Pass conexao and cursor
             break
         else:
             console.print('[red]Digite uma opção válida![/]')
@@ -524,4 +541,62 @@ def inicio():
             time.sleep(1)
             continue
 
+def menu():
+    while True:
+            menu = (
+                '[bold]\n1 - :lock: Trocar senha[/]'
+                '[bold]\n2 - :money_with_wings: Ver crédito[/]'
+                '[bold]\n3 - :fork_and_knife: Ver restaurantes[/]'
+                '[bold]\n4 - :ticket: Ver tickets[/]'
+                '[bold]\n5 - :wastebasket: Deletar conta[/]'
+                '[bold]\n6 - :door: Ir para página de login[/]'
+                '[bold]\n7 - :door: Ir para o início do sistema[/]')
+            mensagem = f'[bold]Escolha uma opção no menu abaixo.[/]\n{menu}'
+            panel = Panel(
+                mensagem,
+                title="[bold green]Menu Interativo[/]",
+                subtitle="Fastake 1.0",
+                border_style="bright_blue"
+            )
+            console.print(panel)
+            opcao_menu = console.input(str('[bold]Digite aqui uma opção válida: [/]'))
+                # == TROCAR SENHA ==
+            if opcao_menu == '1':
+                Usuario.trocar_senha()
 
+            # == VER CRÉDITO ==
+            elif opcao_menu == '2': 
+                Usuario.creditos_ver()
+                
+            # == VER RESTAURANTES ==
+
+            elif opcao_menu == '3':
+                from restaurantes import Restaurantes
+                r = Restaurantes("placeholder", "placeholder")  # Instância qualquer para acessar o método
+                r.ver_restaurantes()
+
+                #Restaurantes.ver_restaurantes()
+                #usuario_logado.ver_restaurantes(conexao, cursor)
+                
+
+            # == VER TICKET ==
+            elif opcao_menu == '4': # EM DESENVOLVIMENTO
+                Usuario.ver_tickets()
+                time.sleep(1)
+                #menu
+
+            # == DELETAR CONTA ==
+
+            elif opcao_menu == '5':
+                Usuario.deletar_conta()
+                
+            elif opcao_menu == '6':
+                time.sleep(1)
+                break
+            elif opcao_menu == '7':
+                inicio()
+                break
+            else:
+                console.print('[bold]Digite uma opção válida![/]')
+                time.sleep(1)
+                continue

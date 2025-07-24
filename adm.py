@@ -48,7 +48,7 @@ class Admin:
         console.print(Panel('[bold] == Bem-vindo à aba de Cadastro para Administradores == [/]'))
         while email:
             console.print('[green]Vamos realizar seu cadastro!\nPor favor preencha os dados abaixo[/]')
-            email_checagem = console.input("[bold]Defina seu email: [/]")
+            email_checagem = console.input("[bold]Defina seu email: [/]") 
             if not cls.validar_modelo_email(email_checagem):
                 console.print("[red]Digite seu email corretamente[/]")
                 continue
@@ -170,7 +170,7 @@ class Admin:
                 elif escolha == '5':
                     from usuario import inicio
                     inicio()
-                    break
+                    return
                 else:
                     console.print("[red]Escolha uma opção válida[/]")
                     time.sleep(1)
@@ -188,30 +188,33 @@ class Admin:
         # Buscar restaurantes do ADM
         cursor.execute("SELECT id, restaurante FROM restaurantes WHERE id_adm = %s", (self.id,))
         restaurantes = cursor.fetchall()
+        if restaurantes:
+            for restaurante in restaurantes:
+                id_restaurante, nome_restaurante = restaurante
+                console.print(f"[bold]\nRestaurante: [green]{nome_restaurante}[/]")
 
-        for restaurante in restaurantes:
-            id_restaurante, nome_restaurante = restaurante
-            console.print(f"[bold]\nRestaurante: [green]{nome_restaurante}[/]")
+                # Buscar pratos desse restaurante
+                cursor.execute("SELECT nome, valor FROM pratos WHERE id_restaurante = %s", (id_restaurante,))
+                pratos = cursor.fetchall()
 
-            # Buscar pratos desse restaurante
-            cursor.execute("SELECT nome, valor FROM pratos WHERE id_restaurante = %s", (id_restaurante,))
-            pratos = cursor.fetchall()
-
-            if not pratos:
-                console.print("[red]Nenhum prato cadastrado.[/]")
-            else:
-                for nome, valor in pratos:
-                    console.print(f"[bold]  Prato: {nome} |Valor: [/][green]R${valor:.2f}[/]")
-        while True:
-            voltar_menu = console.input("[bold]Digite [green]'SIM'[/] para voltar ao menu: [/]")
-            if voltar_menu.upper() == 'SIM':
-                console.print('[bold]Estamos lhe redirecionando para o menu...[/]')
-                time.sleep(1)
-                break
-            else:
-                console.print('[bold]Digite [green]"SIM"[/]![/]')
-                time.sleep(1)
-                continue
+                if not pratos:
+                    console.print("[red]Nenhum prato cadastrado.[/]")
+                else:
+                    for nome, valor in pratos:
+                        console.print(f"[bold]  Prato: {nome} |Valor: [/][green]R${valor:.2f}[/]")
+            while True:
+                voltar_menu = console.input("[bold]Digite [green]'SIM'[/] para voltar ao menu: [/]")
+                if voltar_menu.upper() == 'SIM':
+                    console.print('[bold]Estamos lhe redirecionando para o menu...[/]')
+                    time.sleep(1)
+                    break
+                else:
+                    console.print('[bold]Digite [green]"SIM"[/]![/]')
+                    time.sleep(1)
+                    continue
+        else:
+            console.print('[red]Você ainda não tem restaurantes cadastrados!')
+            time.sleep(1)
 
     def trocar_senha_adm(self):
 
