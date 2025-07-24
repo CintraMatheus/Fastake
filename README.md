@@ -37,6 +37,9 @@ O sistema dá a possibilidade de comprar tickets dos restaurantes participantes,
 
 Caso você já planeje comer em um restaurante mais de uma vez, há a possibilidade de comprar quantos tickets desejar, pois eles ficam armazenados para serem usados quando desejado.
 
+![Fastake Menu](menu.png)
+## Imagem do menu interativo para o usuário comum, com todas as funções e ações  que o mesmo pode realizar
+
 ## Uso para administradores
 
 O sistema possibilita que o administrador cadastre seu restaurante, adicione os pratos, as bebidas, seus valores, e caso deseje, exclua o restaurante da plataforma.
@@ -44,10 +47,10 @@ O sistema possibilita que o administrador cadastre seu restaurante, adicione os 
 Quando o usuário comprar ticket do restaurante, o dinheiro é atribuido à conta cadastrada pelo administrador.
 
 
-![Fastake Menu](menu.png)
+![Fastake Menu](menu_adm.png)
 
 
-## Imagem do menu interativo para o usuário comum, com todas as funções e ações  que o mesmo pode realizar
+## Imagem do menu interativo para o administrador, com todas as funções e ações  que o mesmo pode realizar com seus estabelecimentos
 
 
 
